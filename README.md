@@ -22,6 +22,19 @@ The expense split module syncs across all family members' phones in real time vi
 
 ---
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshot-itinerary.jpeg" width="180"/><br/><sub>📅 Itinerary</sub></td>
+    <td align="center"><img src="docs/screenshot-transport.jpeg" width="180"/><br/><sub>🚌 Transport</sub></td>
+    <td align="center"><img src="docs/screenshot-hotel.jpeg" width="180"/><br/><sub>🏨 Hotel</sub></td>
+    <td align="center"><img src="docs/screenshot-packing.jpeg" width="180"/><br/><sub>🧳 Packing</sub></td>
+  </tr>
+</table>
+
+---
+
 ## Tech Stack
 
 - **Vanilla JS + HTML/CSS** — no framework, no build step
