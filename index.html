@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>北九州別府溫泉・福岡城市漫遊 2026</title>
+<style>
+:root{
+  --bg:#FAF7F2;--bg2:#F0EBE3;--card:#fff;
+  --pri:#C17F4A;--pri-lt:#E8A87C;
+  --grn:#6B9E78;--grn-lt:rgba(107,158,120,.12);
+  --txt:#3D3530;--txt2:#7A6F68;--txt3:#ABA39C;
+  --red:#C94040;--red-lt:rgba(201,64,64,.08);
+  --bdr:#E8E0D8;--shd:0 2px 10px rgba(61,53,48,.07);
+  --r:14px;--nav:60px;--hdr:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC','Microsoft JhengHei','Segoe UI',sans-serif;
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ── App shell ── */
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:480px;margin:0 auto}
+
+/* ── Header ── */
+#hdr{flex-shrink:0;height:var(--hdr);background:var(--pri);
+  display:flex;align-items:center;padding:0 16px;gap:10px}
+.hdr-sakura{font-size:22px;line-height:1}
+.hdr-text{display:flex;flex-direction:column}
+.hdr-title{color:#fff;font-size:16px;font-weight:700;letter-spacing:.5px}
+.hdr-sub{color:rgba(255,255,255,.7);font-size:11px;margin-top:1px}
+
+/* ── Main ── */
+#main{flex:1;overflow:hidden;position:relative}
+.tab{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
+.tab.on{display:flex}
+
+/* ── Day selector ── */
+#day-bar{flex-shrink:0;background:var(--card);border-bottom:1px solid var(--bdr);
+  display:flex;gap:7px;padding:9px 12px;overflow-x:auto;scrollbar-width:none}
+#day-bar::-webkit-scrollbar{display:none}
+.dp{flex-shrink:0;display:flex;flex-direction:column;align-items:center;
+  padding:6px 10px;border-radius:22px;border:1.5px solid var(--bdr);
+  cursor:pointer;transition:all .18s;min-width:58px;background:var(--bg)}
+.dp.on{background:var(--pri);border-color:var(--pri)}
+.dp-date{font-size:13px;font-weight:700;color:var(--txt)}
+.dp.on .dp-date{color:#fff}
+.dp-lbl{font-size:9px;color:var(--txt3);margin-top:1px;max-width:56px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.dp.on .dp-lbl{color:rgba(255,255,255,.75)}
+
+/* ── Day content scroll ── */
+#day-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* ── Day header ── */
+.day-hdr{padding:14px 16px 10px}
+.day-hdr-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.day-name{font-size:17px;font-weight:700}
+.day-wx{font-size:12px;color:var(--txt2);background:var(--bg2);padding:3px 9px;border-radius:16px;white-space:nowrap}
+.day-hi{font-size:13px;color:var(--txt2)}
+.day-cost{display:inline-block;margin-top:5px;font-size:11px;color:var(--pri);
+  background:rgba(193,127,74,.1);padding:3px 9px;border-radius:10px}
+
+/* ── Timeline ── */
+.tl{padding:6px 16px 24px}
+.tl-row{display:grid;grid-template-columns:46px 18px 1fr;gap:0 8px;align-items:start}
+.tl-t{padding-top:16px;text-align:right;font-size:10px;color:var(--txt3);font-weight:500;line-height:1.3}
+.tl-spine{display:flex;flex-direction:column;align-items:center}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--pri);
+  flex-shrink:0;margin-top:17px;border:2px solid var(--bg);
+  box-shadow:0 0 0 2px var(--pri)}
+.tl-line{width:2px;background:var(--bdr);flex:1;min-height:10px}
+.tl-row:last-child .tl-line{opacity:0}
+.tl-card{background:var(--card);border-radius:12px;padding:10px 12px;
+  margin:8px 0 4px;box-shadow:var(--shd)}
+.tl-head{display:flex;align-items:flex-start;gap:8px}
+.tl-ico{font-size:18px;flex-shrink:0;line-height:1.3}
+.tl-body{flex:1;min-width:0}
+.tl-ttl{font-size:14px;font-weight:600;color:var(--txt)}
+.tl-ttl.alert{color:var(--red)}
+.tl-dsc{font-size:12px;color:var(--txt2);margin-top:2px;line-height:1.45}
+.tl-note{margin-top:4px;font-size:11px;color:var(--pri);font-weight:600}
+.map-btn{display:inline-flex;align-items:center;gap:4px;margin-top:8px;
+  padding:5px 11px;background:var(--grn);color:#fff;border-radius:20px;
+  font-size:11px;font-weight:700;text-decoration:none;letter-spacing:.3px}
+
+/* ── Section label ── */
+.sec-lbl{padding:16px 16px 8px;font-size:11px;font-weight:700;
+  color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px}
+
+/* ── Generic scroll tab ── */
+.scroll-tab{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+
+/* ── Transport card ── */
+.tc{background:var(--card);border-radius:var(--r);margin:0 16px 12px;
+  box-shadow:var(--shd);overflow:hidden;flex-shrink:0}
+.tc-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.tc-hdr.blue{background:linear-gradient(135deg,#283593,#3949AB)}
+.tc-hdr.amber{background:linear-gradient(135deg,#7B4F2B,var(--pri))}
+.tc-hdr.green{background:linear-gradient(135deg,#3D7A50,var(--grn))}
+.tc-ico{font-size:22px}
+.tc-ti{display:flex;flex-direction:column}
+.tc-name{font-size:15px;font-weight:700}
+.tc-sub{font-size:12px;opacity:.8;margin-top:1px}
+.tc-hdr.blue .tc-name,.tc-hdr.blue .tc-sub,
+.tc-hdr.amber .tc-name,.tc-hdr.amber .tc-sub,
+.tc-hdr.green .tc-name,.tc-hdr.green .tc-sub{color:#fff}
+.tc-body{padding:2px 14px 12px}
+.tc-row{display:flex;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--bdr)}
+.tc-row:last-child{border-bottom:none}
+.tc-lbl{width:72px;font-size:11px;color:var(--txt3);flex-shrink:0;padding-top:1px;font-weight:600}
+.tc-val{font-size:13px;color:var(--txt);flex:1;line-height:1.4}
+.tc-val.mono{font-family:'Courier New',monospace;font-weight:700;color:var(--pri);font-size:14px;letter-spacing:1px}
+.tc-val.red{color:var(--red);font-weight:700}
+.warn-box{margin:0 14px 12px;padding:9px 12px;background:var(--red-lt);
+  border-left:3px solid var(--red);border-radius:0 8px 8px 0;
+  font-size:12px;color:var(--red);font-weight:600;line-height:1.5}
+.bk-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bdr)}
+.bk-row:last-child{border-bottom:none}
+.bk-ppl{flex:1;font-size:13px;color:var(--txt)}
+.bk-code{font-family:'Courier New',monospace;font-weight:700;font-size:14px;color:var(--pri);letter-spacing:1px}
+.bk-bag{font-size:11px;color:var(--txt3)}
+.city-row{display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid var(--bdr)}
+.city-row:last-child{border-bottom:none}
+.city-name{font-size:13px;color:var(--txt)}
+.city-price{font-size:13px;color:var(--pri);font-weight:600}
+
+/* ── Hotel card ── */
+.hc{background:var(--card);border-radius:var(--r);margin:0 16px 12px;
+  box-shadow:var(--shd);overflow:hidden}
+.hc-hdr{padding:14px 16px;background:linear-gradient(135deg,#7B4F2B,var(--pri-lt))}
+.hc-name{font-size:16px;font-weight:700;color:#fff}
+.hc-loc{font-size:12px;color:rgba(255,255,255,.8);margin-top:2px}
+.hc-warn{margin:0;padding:9px 16px;background:var(--red-lt);
+  font-size:12px;color:var(--red);font-weight:600;border-bottom:1px solid var(--bdr)}
+.hc-body{padding:4px 16px 8px}
+.hc-row{display:flex;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--bdr)}
+.hc-row:last-child{border-bottom:none}
+.hc-lbl{width:60px;font-size:11px;color:var(--txt3);flex-shrink:0;font-weight:600;padding-top:1px}
+.hc-val{font-size:13px;color:var(--txt);flex:1;line-height:1.4;white-space:pre-line}
+.hc-val.ok{color:var(--grn);font-size:12px}
+.hc-val.sm{font-size:12px;color:var(--txt2)}
+.hc-foot{padding:10px 16px 14px;display:flex;gap:8px}
+.hc-map{display:flex;align-items:center;gap:5px;padding:8px 16px;
+  background:var(--grn);color:#fff;border-radius:20px;
+  font-size:13px;font-weight:700;text-decoration:none}
+
+/* ── Packing ── */
+.pack-prog{margin:14px 16px 10px}
+.prog-row{display:flex;justify-content:space-between;font-size:13px;color:var(--txt2);margin-bottom:7px}
+.prog-bar{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--grn);border-radius:3px;transition:width .3s}
+.pack-cat{margin:0 16px 2px}
+.pack-cat-ttl{font-size:14px;font-weight:700;color:var(--txt);padding:12px 0 8px;display:flex;align-items:center;gap:6px}
+.pi{display:flex;align-items:center;gap:10px;padding:9px 12px;
+  background:var(--card);border-radius:10px;margin-bottom:6px;
+  cursor:pointer;box-shadow:var(--shd);transition:opacity .2s}
+.pi.chk{opacity:.45}
+.pi.chk .pi-txt{text-decoration:line-through;color:var(--txt3)}
+.pi-box{width:20px;height:20px;border-radius:6px;border:2px solid var(--bdr);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.pi.chk .pi-box{background:var(--grn);border-color:var(--grn)}
+.pi.chk .pi-box::after{content:"✓";color:#fff;font-size:13px;font-weight:700}
+.pi-txt{font-size:13px;color:var(--txt);flex:1}
+.pack-note{text-align:center;padding:14px 16px;font-size:12px;color:var(--txt3);line-height:1.6}
+
+/* ── Phrases tab ── */
+#scn-bar{flex-shrink:0;background:var(--card);border-bottom:1px solid var(--bdr);
+  display:flex;gap:7px;padding:9px 12px;overflow-x:auto;scrollbar-width:none}
+#scn-bar::-webkit-scrollbar{display:none}
+.sp{flex-shrink:0;padding:6px 12px;border-radius:20px;border:1.5px solid var(--bdr);
+  cursor:pointer;transition:all .18s;background:var(--bg);
+  font-size:12px;font-weight:600;color:var(--txt2);white-space:nowrap}
+.sp.on{background:var(--pri);border-color:var(--pri);color:#fff}
+#phrase-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px}
+.ph-card{background:var(--card);border-radius:12px;padding:14px 14px 12px;
+  margin-bottom:10px;box-shadow:var(--shd);display:flex;align-items:flex-start;gap:10px}
+.ph-txt{flex:1;min-width:0}
+.ph-jp{font-size:17px;font-weight:700;color:var(--pri);line-height:1.4;margin-bottom:4px}
+.ph-zh{font-size:13px;color:var(--txt);margin-bottom:3px}
+.ph-rm{font-size:11px;color:var(--txt3);font-style:italic}
+.ph-voice{flex-shrink:0;width:40px;height:40px;border-radius:50%;
+  background:var(--pri);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;transition:all .15s;box-shadow:0 2px 8px rgba(193,127,74,.3)}
+.ph-voice:active{transform:scale(.92);background:var(--pri-lt)}
+.ph-voice.speaking{background:var(--grn);animation:pulse .7s infinite alternate}
+@keyframes pulse{from{box-shadow:0 2px 8px rgba(107,158,120,.3)}to{box-shadow:0 2px 16px rgba(107,158,120,.6)}}
+.ph-tip{text-align:center;padding:10px 0 20px;font-size:12px;color:var(--txt3);line-height:1.6}
+.no-tts{display:none;margin:12px 16px;padding:10px 12px;background:var(--red-lt);
+  border-left:3px solid var(--red);border-radius:0 8px 8px 0;
+  font-size:12px;color:var(--red)}
+
+/* ── Bottom nav ── */
+#nav{flex-shrink:0;height:var(--nav);background:var(--card);
+  display:flex;border-top:1px solid var(--bdr);overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+.nb{flex:1;flex-shrink:0;min-width:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:none;border:none;cursor:pointer;gap:2px;padding:6px 4px;transition:all .15s}
+.nb-ico{font-size:21px;line-height:1;transition:transform .15s}
+.nb-lbl{font-size:10px;font-weight:600;color:var(--txt3)}
+.nb.on .nb-lbl{color:var(--pri)}
+.nb.on .nb-ico{transform:scale(1.12)}
+
+.pad{height:24px}
+
+/* ══ Split / 分帳 ══════════════════════════════ */
+.split-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 4px;flex-shrink:0}
+.split-ttl{font-size:17px;font-weight:700}
+.gear-btn{background:none;border:none;font-size:20px;cursor:pointer;padding:4px;line-height:1;opacity:.7}
+.mem-cards{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.mem-cards::-webkit-scrollbar{display:none}
+.mem-card{flex-shrink:0;background:var(--card);border-radius:12px;padding:8px 12px;box-shadow:var(--shd);text-align:center;min-width:72px}
+.mem-card-name{font-size:11px;font-weight:600;color:var(--txt2)}
+.mem-card-total{font-size:12px;color:var(--txt);font-weight:700;margin-top:3px}
+.mem-card-amt{font-size:10px;color:var(--pri);margin-top:2px}
+.mem-card-amt.neg{color:var(--red)}
+.exp-solo{display:inline-block;font-size:9px;font-weight:700;color:var(--txt2);background:var(--bg2);border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle}
+.split-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.exp-sec-lbl{padding:14px 16px 6px;font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px}
+.exp-card{background:var(--card);border-radius:12px;margin:0 16px 8px;padding:10px 12px;box-shadow:var(--shd);display:flex;align-items:flex-start;gap:10px}
+.exp-ico-w{font-size:22px;flex-shrink:0;line-height:1.3;padding-top:1px}
+.exp-info{flex:1;min-width:0}
+.exp-name{font-size:14px;font-weight:600;color:var(--txt)}
+.exp-sub{font-size:11px;color:var(--txt2);margin-top:2px;line-height:1.4}
+.exp-nt{font-size:11px;color:var(--pri);margin-top:2px}
+.exp-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.exp-jpy{font-size:15px;font-weight:700;color:var(--pri)}
+.exp-myr{font-size:10px;color:var(--txt3)}
+.exp-del-btn{background:none;border:none;color:var(--txt3);font-size:15px;cursor:pointer;padding:2px}
+.settle-box{margin:10px 16px;background:var(--grn-lt);border:1.5px solid var(--grn);border-radius:12px;padding:12px 14px}
+.settle-hd{font-size:13px;font-weight:700;color:var(--grn);margin-bottom:8px}
+.settle-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(107,158,120,.2);font-size:13px;color:var(--txt)}
+.settle-row:last-child{border:none}
+.settle-val{text-align:right}
+.settle-jpy{font-weight:700;color:var(--grn);display:block}
+.settle-rm{font-size:10px;color:var(--txt3);display:block}
+.share-btn{display:flex;align-items:center;justify-content:center;gap:6px;margin:8px 16px 4px;padding:11px;background:var(--grn);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;width:calc(100% - 32px)}
+.share-btn:active{opacity:.85}
+/* ── Analytics ── */
+.an-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.an-card{background:var(--card);border-radius:var(--r);margin:0 16px 12px;padding:14px 16px;box-shadow:var(--shd)}
+.an-ttl{font-size:13px;font-weight:700;color:var(--txt2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px}
+.an-hero{text-align:center;padding:4px 0 10px}
+.an-hero-num{font-size:30px;font-weight:700;color:var(--pri);line-height:1.1}
+.an-hero-sub{font-size:12px;color:var(--txt2);margin-top:3px}
+.an-stat-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--bdr)}
+.an-stat-row:last-child{border:none}
+.an-stat-lbl{font-size:13px;color:var(--txt2)}
+.an-stat-val{font-size:14px;font-weight:700;color:var(--pri)}
+.bar-row{display:flex;align-items:center;gap:8px;padding:4px 0}
+.bar-lbl{width:44px;font-size:11px;color:var(--txt2);text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-wrap{flex:1;background:var(--bg2);border-radius:3px;height:9px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;background:var(--pri);transition:width .5s}
+.bar-fill.grn{background:var(--grn)}
+.bar-val{width:52px;font-size:11px;color:var(--txt);text-align:right;flex-shrink:0;font-weight:600}
+.mini-cards{display:flex;gap:8px;margin-top:12px}
+.mini-card{flex:1;background:var(--bg2);border-radius:10px;padding:10px 12px;text-align:center}
+.mini-card-lbl{font-size:10px;color:var(--txt3);margin-bottom:3px}
+.mini-card-val{font-size:16px;font-weight:700;color:var(--pri)}
+.mini-card-val.grn{color:var(--grn)}
+.mini-card-sub{font-size:10px;color:var(--txt3);margin-top:2px}
+.empty-hint{text-align:center;padding:40px 16px;color:var(--txt3);font-size:14px;line-height:1.8}
+#fab-add{position:fixed;bottom:76px;right:18px;width:52px;height:52px;border-radius:50%;background:var(--pri);color:#fff;font-size:28px;border:none;box-shadow:0 4px 16px rgba(193,127,74,.5);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:50;transition:transform .15s}
+#fab-add:active{transform:scale(.92)}
+.m-ov{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.m-ov.open{display:flex}
+.m-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding-bottom:32px}
+.m-pill{width:36px;height:4px;background:var(--bdr);border-radius:2px;margin:10px auto 0}
+.m-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 0}
+.m-title{font-size:17px;font-weight:700}
+.m-close{background:none;border:none;font-size:22px;color:var(--txt2);cursor:pointer;line-height:1;padding:4px}
+.m-body{padding:10px 16px 0}
+.m-lbl{font-size:12px;font-weight:700;color:var(--txt2);margin:12px 0 6px;letter-spacing:.4px;text-transform:uppercase}
+.cat-row{display:flex;gap:8px}
+.cat-btn{flex:1;padding:8px 4px;border-radius:10px;border:1.5px solid var(--bdr);background:var(--bg);text-align:center;cursor:pointer;font-size:20px;transition:all .15s}
+.cat-btn .cat-lbl{display:block;font-size:10px;font-weight:600;color:var(--txt3);margin-top:2px}
+.cat-btn.on{border-color:var(--pri);background:rgba(193,127,74,.08)}
+.cat-btn.on .cat-lbl{color:var(--pri)}
+.src-row{display:flex;gap:8px}
+.src-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px;border-radius:10px;border:1.5px solid var(--bdr);background:var(--bg);font-size:11px;font-weight:600;color:var(--txt2);cursor:pointer;transition:all .15s}
+.src-btn .s-ico{font-size:20px}
+.src-btn.on{border-color:var(--pri);background:rgba(193,127,74,.08);color:var(--pri)}
+.m-inp{width:100%;padding:10px 12px;border:1.5px solid var(--bdr);border-radius:10px;font-size:15px;color:var(--txt);background:var(--bg);outline:none;font-family:inherit;box-sizing:border-box}
+.m-inp:focus{border-color:var(--pri)}
+.m-sel{width:100%;padding:10px 12px;border:1.5px solid var(--bdr);border-radius:10px;font-size:14px;color:var(--txt);background:var(--bg);outline:none;cursor:pointer;font-family:inherit;box-sizing:border-box}
+.m-sel:focus{border-color:var(--pri)}
+.cur-grp{display:flex;gap:8px}
+.cur-sel{padding:10px 8px;border:1.5px solid var(--bdr);border-radius:10px;font-size:14px;font-weight:700;color:var(--pri);background:var(--bg);outline:none;cursor:pointer;font-family:inherit}
+.mem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mc{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--bdr);background:var(--bg);cursor:pointer;transition:all .15s}
+.mc.on{border-color:var(--pri);background:rgba(193,127,74,.08)}
+.mc-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--bdr);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;font-weight:700;transition:all .15s}
+.mc.on .mc-dot{background:var(--pri);border-color:var(--pri);color:#fff}
+.mc-lbl{font-size:13px;font-weight:600;color:var(--txt)}
+.mc.on .mc-lbl{color:var(--pri)}
+.payer-row{display:flex;gap:6px;flex-wrap:wrap}
+.pay-btn{padding:7px 12px;border-radius:20px;border:1.5px solid var(--bdr);background:var(--bg);font-size:12px;font-weight:600;color:var(--txt2);cursor:pointer;transition:all .15s}
+.pay-btn.on{border-color:var(--grn);background:var(--grn-lt);color:var(--grn)}
+#photo-prev{width:100%;max-height:180px;object-fit:contain;border-radius:10px;border:1.5px solid var(--bdr);background:var(--bg2);display:none;margin-top:8px}
+.ocr-spin{display:none;text-align:center;padding:10px;font-size:13px;color:var(--txt2)}
+.sub-btn{width:100%;padding:13px;background:var(--pri);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;letter-spacing:.3px}
+.sub-btn:active{opacity:.85}
+.sub-btn:disabled{opacity:.45;cursor:not-allowed}
+.cfg-note{font-size:11px;color:var(--txt3);margin-top:4px;line-height:1.6}
+.sel-all{color:var(--pri);cursor:pointer;font-weight:600;font-size:11px;text-decoration:underline}
+.sync-badge{font-size:10px;background:var(--grn);color:#fff;padding:2px 7px;border-radius:10px;margin-left:6px;font-weight:700;vertical-align:middle}
+.sync-off{background:var(--txt3)}
+
+/* ── Shopping ── */
+.shop-area{background:var(--card);border-radius:var(--r);margin:0 16px 12px;box-shadow:var(--shd);overflow:hidden;flex-shrink:0}
+.shop-area-hdr{padding:12px 14px;display:flex;align-items:center;gap:10px}
+.shop-area-hdr.rose{background:linear-gradient(135deg,#8B3A5C,#C4617A)}
+.shop-area-hdr.navy{background:linear-gradient(135deg,#283593,#3949AB)}
+.shop-area-hdr.forest{background:linear-gradient(135deg,#3D7A50,var(--grn))}
+.shop-area-hdr.amber{background:linear-gradient(135deg,#7B4F2B,var(--pri))}
+.shop-area-hdr.purple{background:linear-gradient(135deg,#6A3D9A,#9A5DC8)}
+.shop-area-hdr.teal{background:linear-gradient(135deg,#00695C,#26A69A)}
+.shop-area-ico{font-size:22px}
+.shop-area-ti{flex:1}
+.shop-area-name{font-size:15px;font-weight:700;color:#fff}
+.shop-area-sub{font-size:11px;color:rgba(255,255,255,.8);margin-top:2px}
+.shop-item{padding:10px 14px;border-bottom:1px solid var(--bdr)}
+.shop-item:last-child{border-bottom:none}
+.shop-item-name{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.shop-item-desc{font-size:12px;color:var(--txt2);line-height:1.5}
+.shop-item-tag{display:inline-block;font-size:10px;background:rgba(193,127,74,.12);color:var(--pri);padding:1px 7px;border-radius:10px;font-weight:700;flex-shrink:0}
+.shop-tip-box{margin:0 16px 12px;padding:10px 14px;border-radius:12px;font-size:12px;line-height:1.8;flex-shrink:0}
+.shop-tip-box.yellow{background:rgba(255,193,7,.1);border-left:3px solid #FFC107;color:#7B6000;font-weight:600}
+.shop-tip-box.green{background:var(--grn-lt);border-left:3px solid var(--grn);color:var(--grn);font-weight:600}
+.shop-tip-box.blue{background:rgba(57,73,171,.08);border-left:3px solid #3949AB;color:#283593;font-weight:600}
+</style>
+<!-- Firebase Realtime DB SDK（選用，多人同步用） -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div id="app">
+
+<header id="hdr">
+  <div class="hdr-sakura">🌸</div>
+  <div class="hdr-text">
+    <div class="hdr-title">別府溫泉・福岡城市漫遊</div>
+    <div class="hdr-sub">2026 · 5/11 – 5/20 · 6人</div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- 行程 -->
+  <div id="t-itin" class="tab on">
+    <div id="day-bar"></div>
+    <div id="day-scroll"></div>
+  </div>
+
+  <!-- 交通 -->
+  <div id="t-trans" class="tab scroll-tab"></div>
+
+  <!-- 住宿 -->
+  <div id="t-hotel" class="tab scroll-tab"></div>
+
+  <!-- 行李 -->
+  <div id="t-pack" class="tab scroll-tab"></div>
+
+  <!-- 對話 -->
+  <div id="t-phrase" class="tab">
+    <div id="scn-bar"></div>
+    <div class="no-tts" id="tts-warn">此瀏覽器不支援語音功能</div>
+    <div id="phrase-scroll"></div>
+  </div>
+
+  <!-- 購物 -->
+  <div id="t-shop" class="tab scroll-tab"></div>
+
+  <!-- 分帳 -->
+  <div id="t-split" class="tab"></div>
+
+  <!-- 支出分析 -->
+  <div id="t-analysis" class="tab"></div>
+
+  <!-- Ynes 個人 -->
+  <div id="t-ynes" class="tab"></div>
+
+  <!-- Ynes 台灣花費 -->
+  <div id="t-ynes-tw" class="tab"></div>
+
+</main>
+
+<nav id="nav">
+  <button class="nb on" id="nb-itin" onclick="sw('itin')"><span class="nb-ico">📅</span><span class="nb-lbl">行程</span></button>
+  <button class="nb" id="nb-trans" onclick="sw('trans')"><span class="nb-ico">🚌</span><span class="nb-lbl">交通</span></button>
+  <button class="nb" id="nb-hotel" onclick="sw('hotel')"><span class="nb-ico">🏨</span><span class="nb-lbl">住宿</span></button>
+  <button class="nb" id="nb-pack" onclick="sw('pack')"><span class="nb-ico">🧳</span><span class="nb-lbl">行李</span></button>
+  <button class="nb" id="nb-shop" onclick="sw('shop')"><span class="nb-ico">🛍️</span><span class="nb-lbl">購物</span></button>
+  <button class="nb" id="nb-split" onclick="sw('split')"><span class="nb-ico">💰</span><span class="nb-lbl">分帳</span></button>
+  <button class="nb" id="nb-analysis" onclick="sw('analysis')"><span class="nb-ico">📊</span><span class="nb-lbl">分析</span></button>
+  <button class="nb" id="nb-ynes" onclick="sw('ynes')"><span class="nb-ico">👤</span><span class="nb-lbl">Ynes</span></button>
+  <button class="nb" id="nb-ynes-tw" onclick="sw('ynes-tw')"><span class="nb-ico">🇹🇼</span><span class="nb-lbl">台灣</span></button>
+</nav>
+
+</div>
+
+<!-- FAB -->
+<button id="fab-add" onclick="openCtxExp()">＋</button>
+
+<!-- Modal: 新增費用 -->
+<div class="m-ov" id="m-add" onclick="handleOvClick(event)">
+  <div class="m-sheet">
+    <div class="m-pill"></div>
+    <div class="m-head">
+      <div class="m-title" id="m-add-title">新增費用</div>
+      <button class="m-close" onclick="closeModals()">✕</button>
+    </div>
+    <div class="m-body" id="m-add-body"></div>
+  </div>
+</div>
+
+<!-- Modal: 設定 -->
+<div class="m-ov" id="m-cfg" onclick="handleOvClick(event)">
+  <div class="m-sheet">
+    <div class="m-pill"></div>
+    <div class="m-head">
+      <div class="m-title">⚙️ 設定</div>
+      <button class="m-close" onclick="closeModals()">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="m-lbl">Anthropic API Key（拍照辨識用）</div>
+      <input class="m-inp" id="cfg-key" type="password" placeholder="sk-ant-api03-...">
+      <div class="cfg-note">取得：console.anthropic.com → API Keys → Create Key<br>Key 只存在你的瀏覽器裡，不傳至任何伺服器</div>
+      <div class="m-lbl" style="margin-top:16px">匯率（1 MYR = ? 日圓）</div>
+      <input class="m-inp" id="cfg-rate" type="number" placeholder="33">
+      <div class="cfg-note">例：33 代表 RM1 = ¥33</div>
+      <div class="m-lbl" style="margin-top:16px">匯率（1 TWD = ? RM）</div>
+      <input class="m-inp" id="cfg-ntd-rate" type="number" placeholder="0.14" step="0.001">
+      <div class="cfg-note">例：0.14 代表 NT$1 = RM0.14；用於新台幣費用換算</div>
+      <button class="sub-btn" onclick="saveCfg()">儲存設定</button>
+    </div>
+  </div>
+</div>
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+
+const DAYS=[
+  {date:"5/11",wd:"一",lbl:"KL→台灣",wx:"☀️ 26°C",hi:"出發！吉隆坡飛桃園",cost:"MYR 30–50",
+   items:[
+    {t:"15:00",i:"🛂",n:"前往 KUL T1 辦理登機",d:"建議 15:00 前抵達"},
+    {t:"17:20",i:"✈️",n:"JX726 起飛",d:"KUL T1 → TPE T2 · A321NEO · 飛機餐"},
+    {t:"22:15",i:"🛬",n:"桃園 T2 落地",d:"入境辦理，過海關",note:"靜宜：行李可暫存海關"},
+    {t:"23:00",i:"🏨",n:"機場背包客 Check-in",d:"宵夜：超商 7-Eleven / FamilyMart"},
+  ]},
+  {date:"5/12",wd:"二",lbl:"台灣→別府",wx:"🌧️ 22°C 有雨",hi:"抵達日本！取車自駕到別府",cost:"¥1,000–2,000",
+   items:[
+    {t:"06:30",i:"🏨",n:"機場背包客 Check-out",d:"輕裝前往機場"},
+    {t:"06:40",i:"🥐",n:"桃園機場早餐",d:"航廈美食街或超商"},
+    {t:"09:35",i:"✈️",n:"JX840 起飛",d:"TPE T1 → 福岡 · A330-900NEO",note:"⚠️ 注意是 T1！"},
+    {t:"13:05",i:"🛬",n:"福岡國際航廈落地",d:"辦入境手續",note:"⚠️ 落地後致電 092-260-9506，接駁車來國際線出口接車"},
+    {t:"13:30",i:"📦",n:"黑貓宅急便 寄行李",d:"機場宅急便服務台 · 部分行李寄往別府飯店"},
+    {t:"14:30",i:"🚗",n:"ハコレンタカー 取車",d:"福岡空港 国際線出口 · 道深領車",m:"ハコレンタカー 福岡空港",alert:true,note:"⚠️ 道深必帶國際駕照正本！"},
+    {t:"15:00",i:"🚗",n:"自駕出發 → 別府",d:"車程約 2 小時 · TOYOTA Alphard · 途中超商買零食",m:"別府 大分県",note:"⚠️ 山路注意暈車 — 備暈車藥 / 酸梅！"},
+    {t:"17:00",i:"🏨",n:"AMANEK Beppu Check-in",d:"別府市駅前本町 6-35 · 15:00 後 check-in",m:"AMANEK Beppu YULA-RE"},
+    {t:"18:30",i:"🍣",n:"晚餐：水天壽司",d:"17:00–21:30 · 別府在地壽司老舖",m:"水天寿司 別府"},
+    {t:"20:00",i:"🛒",n:"Super Center Trial 採購",d:"24小時營業 · 生鮮食材・日用雜貨・飲料零食超值",m:"スーパーセンタートライアル 別府"},
+    {t:"21:00",i:"🛍️",n:"Ynes → Don Quijote 掃貨",d:"24H 藥妝 · 2:00 打烊",m:"ドン・キホーテ 別府"},
+  ]},
+  {date:"5/13",wd:"三",lbl:"別府地獄巡",wx:"🌦️ 22°C 毛毛雨",hi:"竹瓦溫泉 + 地獄溫泉 + 湯霧展望台",cost:"¥7,000–9,000",
+   items:[
+    {t:"07:30",i:"♨️",n:"竹瓦溫泉",d:"砂浴 · 需提前預約 · 別府百年名湯",m:"竹瓦温泉 別府",note:"⚠️ 記得預約！"},
+    {t:"08:00",i:"🚶",n:"商店街閒逛 + 友永百年麵包",d:"別府超人氣老舖 · 必買：牛奶麵包、咖哩麵包",m:"友永パン 別府"},
+    {t:"09:00",i:"☕",n:"鹽月堂 早茶",d:"09:00–19:00 · 傳統和菓子茶屋",m:"鹽月堂 別府"},
+    {t:"09:30",i:"🏨",n:"回飯店休息",d:""},
+    {t:"10:30",i:"♨️",n:"地獄溫泉巡遊",d:"7地獄共通券 ¥1,500 · 海地獄（碧藍）、血の池（暗紅）、龍巻（噴泉）· 自駕前往",m:"別府地獄めぐり"},
+    {t:"12:00",i:"🍳",n:"午餐：地獄蒸工坊",d:"¥2,000–3,000/人 · 必吃：地獄蒸し饅頭、布丁",m:"地獄蒸し工房鉄輪"},
+    {t:"13:00",i:"🏨",n:"回飯店休息",d:""},
+    {t:"17:00",i:"🛍️",n:"Workman Plus 掃貨",d:"機能衣物、防風外套，CP 值極高",m:"ワークマン 別府"},
+    {t:"19:00",i:"🍽️",n:"晚餐",d:""},
+    {t:"20:30",i:"🌫️",n:"湯霧展望台",d:"別府夜景 · 湯煙地景",m:"湯けむり展望台 別府"},
+    {t:"21:00",i:"🍶",n:"飯店小酒局 — AMANEK Hotel",d:"酒精飲料無限暢飲 · ¥1,000/人 · 自家溫泉＋酒局絕配",},
+  ]},
+  {date:"5/14",wd:"四",lbl:"阿蘇大草原",wx:"☀️ 24°C 大部晴朗",hi:"自駕出發！上色見神社 + 草千裡 + 牛奶之路",cost:"¥4,000–5,000",
+   items:[
+    {t:"06:00",i:"🚗",n:"出發阿蘇",d:"自駕 · 車程約 1.5 小時",m:"阿蘇市",note:"⚠️ 草千裡海拔約 1,000m，比山下涼 5–8°C，建議帶薄外套"},
+    {t:"08:00",i:"⛩️",n:"上色見熊野座神社 打卡",d:"穿越 270 根鳥居石階 · 免費入場",m:"上色見熊野座神社"},
+    {t:"08:30",i:"🥐",n:"早午餐",d:"附近餐廳"},
+    {t:"09:30",i:"🌿",n:"出發草千裡の浜 · 牛奶之路",d:"廣闊草原與火口湖 · 入場 ¥500 · 草千裡珈琲焙煎所喝咖啡休息",m:"草千里ヶ浜 阿蘇"},
+    {t:"11:00",i:"🗻",n:"米塚展望地 打卡",d:"",m:"米塚 阿蘇"},
+    {t:"11:30",i:"🛍️",n:"阿蘇站綜合商店 伴手禮 + 海賊王打卡",d:"阿蘇牛乳冰淇淋 · ウソップ看板打卡",m:"阿蘇駅"},
+    {t:"13:00",i:"♨️",n:"夢の湯 打卡機位",d:"",m:"夢の湯 阿蘇"},
+    {t:"13:10",i:"🍜",n:"午餐：大阿蘇ラーメン 火の国",d:"",m:"大阿蘇ラーメン火の国 阿蘇"},
+    {t:"15:00",i:"🚗",n:"返回別府",d:"約 2 小時，天黑前下山",m:"別府 大分県"},
+    {t:"17:00",i:"🏨",n:"飯店休息",d:""},
+    {t:"19:00",i:"🍶",n:"晚餐：居酒屋",d:"",m:"別府 居酒屋"},
+  ]},
+  {date:"5/15",wd:"五",lbl:"由布院散策",wx:"☀️ 21°C 晴有薄雲",hi:"由布院街道 + 金鱗湖 + 天丼",cost:"¥7,000–10,000",
+   items:[
+    {t:"08:00",i:"📦",n:"⚠️ Ynes 出門前寄行李",d:"黑貓宅急便 · 行李寄往福岡飯店",alert:true},
+    {t:"08:30",i:"🥐",n:"早餐",d:"超商，輕便出發"},
+    {t:"09:30",i:"🚗",n:"前往由布院",d:"車程約 40 分"},
+    {t:"10:15",i:"🍽️",n:"湯之岳庵 — 排隊！",d:"不接受預約，早到排隊 · ¥2,500–3,500/人",m:"湯の岳庵 由布院"},
+    {t:"11:30",i:"🛍️",n:"湯之坪街道散步",d:"鞠智銅鑼燒（4點前結帳）、炸豬排吐司、可樂餅",m:"湯の坪街道 由布院"},
+    {t:"13:00",i:"🏞️",n:"金鱗湖散步",d:"免費 · 湖邊咖啡廳、草莓大福",m:"金鱗湖 由布院"},
+    {t:"15:00",i:"🛒",n:"由布院自由購物",d:"工藝品、甜點伴手禮"},
+    {t:"17:00",i:"🚗",n:"返回別府",d:"約 40 分"},
+    {t:"17:30",i:"🍽️",n:"備案：Sannoichi",d:"17:30 開 · 可視情況前往",m:"Sannoichi 別府"},
+    {t:"19:00",i:"🍱",n:"晚餐：天丼 とよ常本店",d:"需排隊 · 11:00–20:00 · ¥1,200–1,500/人",m:"天丼とよ常本店 別府"},
+  ]},
+  {date:"5/16",wd:"六",lbl:"太宰府→福岡",wx:"☁️ 26°C",hi:"太宰府天滿宮 + 螃蟹宴 + daco + 飯店小酒局",cost:"¥10,000–13,000",
+   items:[
+    {t:"08:00",i:"🧳",n:"AMANEK 退房",d:"輕裝出發太宰府",m:"AMANEK Beppu YULA-RE"},
+    {t:"10:00",i:"⛩️",n:"太宰府天滿宮",d:"學問之神 · 免費入場",m:"太宰府天満宮"},
+    {t:"10:30",i:"🍡",n:"梅枝餅 現烤 + 周邊閒逛",d:"¥200/個 · 必買：岩座 oisesan 淨化鹽噴霧（防小人）",m:"梅ヶ枝餅 太宰府"},
+    {t:"11:00",i:"☕",n:"Koselig 八女抹茶拿鐵",d:"¥700",m:"Koselig 太宰府"},
+    {t:"11:30",i:"🍓",n:"車站前天山草莓大福",d:"",m:"天山 草苺大福 太宰府"},
+    {t:"12:30",i:"🍱",n:"午餐 · 沿路看",d:""},
+    {t:"14:00",i:"☕",n:"藥院 Coffee Country（可選）",d:"",m:"Coffee Country 薬院 福岡"},
+    {t:"14:30",i:"🏨",n:"BASE LAYER HOTEL Check-in",d:"1-14-15 Kiyokawa, Chuo Ward · 15:00 後",m:"BASE LAYER HOTEL FUKUOKA"},
+    {t:"15:10",i:"🚗",n:"還車 — 福岡空港 ハコレンタカー",d:"道深駕車 · 福岡市博多区西月隈2-10",m:"ハコレンタカー 福岡空港"},
+    {t:"16:00",i:"🍩",n:"daco 外帶回飯店",d:"i'm donut 集團旗下店",m:"daco 福岡"},
+    {t:"17:00",i:"🦀",n:"晚餐：博多甲羅本店 螃蟹宴",d:"森区 1-6-39 · ¥5,000–8,000/人",m:"博多甲羅本店",note:"*鄰近 LaLaport · Ewin 可去看高達"},
+    {t:"18:30",i:"🤖",n:"LaLaport / 高達（Ewin）或回飯店",d:"回家前到地下超市買草莓 · 2F/3F：Keen 鞋子（Murasaki Sports）",m:"ららぽーと福岡"},
+  ]},
+  {date:"5/17",wd:"日",lbl:"福岡 Shopping",wx:"⛅ 25°C",hi:"蚤の市 + Pan Shirio 下午茶 + 天神商圈！",cost:"¥8,000–12,000＋購物",
+   items:[
+    {t:"09:00",i:"🦞",n:"早餐：龍蝦海鮮丼 Kanekatsu",d:"飯店步行 6 分 · ¥3,000–4,000/人，非常熱門",m:"かねかつ食堂 福岡"},
+    {t:"10:30",i:"🎪",n:"護国神社 蚤の市 + 大濠公園散步",d:"蚤の市 09:00–16:00 · 地鐵七隈線「六本松站」2號出口步行 8 分 · 逛完市集到旁邊大濠公園湖邊散步",m:"護国神社 福岡"},
+    {t:"12:30",i:"🎂",n:"出發往 Pan Shirio",d:"唐人町車站附近 · 步行可達",m:"Pan Shirio 福岡 唐人町"},
+    {t:"13:00",i:"🍰",n:"Pan Shirio 下午茶芭菲（內用）",d:"排隊入座 · 蒙布朗・季節甜點 · 原為 i'm donut 集團旗下",m:"Pan Shirio 福岡 唐人町"},
+    {t:"15:00",i:"🛍️",n:"天神商圈購物 — 第一站 Mina 天神",d:"GU・UNIQLO・DAISO・3COINS・LOFT・AEON・MUJI",m:"Mina天神 福岡"},
+    {t:"16:30",i:"🛒",n:"天神商圈購物 — 第二站 大丸・三越・岩田屋",d:"靜宜去 Solaria Plaza · 大丸 B1 福壽園：抹茶粉＋茶筅 · B2 美食 & 伴手禮 · 記得帶 95 折卡",m:"岩田屋本店 天神 福岡"},
+    {t:"19:00",i:"🍱",n:"晚餐：百貨公司美食街",d:"大丸・三越・岩田屋 地下2F 美食街任選",m:"大丸福岡天神店"},
+  ]},
+  {date:"5/18",wd:"一",lbl:"福岡悠閒日",wx:"🌧️ 22°C 有雨",hi:"名店麵包 + Robata 烤鮭魚飯 · 雨天在飯店舒服休息",cost:"¥5,000–7,000",
+   items:[
+    {t:"07:00",i:"📦",n:"⚠️ 告知飯店：大行李直送機場",d:"CARGO PASS · 明早行李送福岡國際航廈",alert:true},
+    {t:"07:30",i:"🥖",n:"名店麵包排隊",d:"don blablabla / full full · 必買：明太子法棍、黑松露麵包 · 備註：可分兩組，部分人留飯店休息",m:"天神 パン屋 福岡"},
+    {t:"12:00",i:"🐟",n:"午餐：Robata no Ito Okashi",d:"已預約 · ¥2,500/人 · 烤鮭魚飯套餐",m:"炉端のいとおかし 福岡",note:"⚠️ 12pm 出門，1pm 前要抵達"},
+    {t:"13:30",i:"🍓",n:"鈴懸 百年和菓子 草莓大福",d:"中洲川端站 5號出口 · 百年老舖名物",m:"鈴懸 中洲川端 福岡"},
+    {t:"15:00",i:"🎒",n:"博多商圈採購",d:"友都八喜博多（電器・玩具・相機・DAISO；樓上 Lopia 超市超值掃貨）→ 博多阪急 B2 伴手禮（連 AMU 3F 美妝，M3 退稅）",m:"ヤマダデンキ LABI1博多 福岡"},
+  ]},
+  {date:"5/19",wd:"二",lbl:"福岡→台灣",wx:"🌧️ 27°C 有雨",hi:"最後一日！烤鮭魚飯 → 飛台灣",cost:"¥5,000–6,000",
+   items:[
+    {t:"10:00前",i:"🧳",n:"BASE LAYER Check-out",d:"大行李已 CARGO PASS，輕裝離開"},
+    {t:"11:00",i:"🛍️",n:"天神地下街最後採購！",d:"伴手禮衝刺",m:"天神地下街 福岡"},
+    {t:"13:30",i:"🚕",n:"計程車 → 福岡機場",d:"約 20 分 · ¥2,000–2,500",m:"福岡空港 国際線"},
+    {t:"15:00",i:"🛂",n:"機場 Check-in / 安檢",d:"確認 CARGO PASS 行李已抵達"},
+    {t:"16:00",i:"✈️",n:"JX1841 起飛",d:"FUK → TPE T1 · A321NEO"},
+    {t:"17:30",i:"🛬",n:"桃園 T1 落地",d:"通關、提領行李，分流過夜用品"},
+    {t:"18:30",i:"🏨",n:"Elim Hotel 中壢 Check-in",d:"",m:"艾林商旅 中壢"},
+    {t:"晚餐",i:"🍜",n:"清燉牛肉麵 + 中壢夜市",d:"+ 家樂福超市補貨",m:"小巷子清燉牛肉麵 中壢"},
+  ]},
+  {date:"5/20",wd:"三",lbl:"回 KL！",wx:"☀️ 27°C",hi:"豆漿早餐 → 飛回吉隆坡 🎉",cost:"NTD 100",
+   items:[
+    {t:"07:00前",i:"🏨",n:"Elim Hotel Check-out",d:""},
+    {t:"07:30",i:"📦",n:"機場提領寄存行李",d:"桃園機場寄存處"},
+    {t:"08:30",i:"🥛",n:"早餐：永和傳統豆漿",d:"機場附近 · NTD 100",m:"永和豆漿 桃園"},
+    {t:"09:30",i:"🛂",n:"JX725 Check-in / 托運",d:"桃園 T2，提早辦理"},
+    {t:"11:15",i:"✈️",n:"JX725 起飛 🎉",d:"TPE T2 → KUL T1 · A321NEO · 5人返馬！"},
+    {t:"16:10",i:"🏠",n:"吉隆坡 T1 落地 — 回家！",d:"Ynes 留台至 7/1"},
+  ]},
+];
+
+// ── Split constants ──
+const MEMBERS=['Ynes','媽','三姨','二姨','道深','Ewin'];
+const CAT_LIST=[
+  {id:'food',icon:'🍽️',lbl:'餐飲'},
+  {id:'taxi',icon:'🚖',lbl:'交通'},
+  {id:'ticket',icon:'🎟️',lbl:'門票'},
+  {id:'shop',icon:'🛒',lbl:'購物'},
+];
+const REST_LIST=[
+  {date:'5/12',name:'水天壽司',meal:'晚餐'},
+  {date:'5/14',name:'大阿蘇ラーメン火の国',meal:'午餐'},
+  {date:'5/13',name:'友永百年麵包',meal:'早餐'},
+  {date:'5/13',name:'鹽月堂',meal:'早茶'},
+  {date:'5/13',name:'地獄蒸工坊',meal:'午餐'},
+  {date:'5/15',name:'湯之岳庵',meal:'早午餐'},
+  {date:'5/15',name:'湯之坪街道小吃',meal:'下午'},
+  {date:'5/15',name:'天丼とよ常本店',meal:'晚餐'},
+  {date:'5/16',name:'Koselig 八女抹茶拿鐵',meal:'下午'},
+  {date:'5/16',name:'博多甲羅本店',meal:'晚餐'},
+  {date:'5/17',name:'Kanekatsu 食堂',meal:'早餐'},
+  {date:'5/17',name:'Pan Shirio',meal:'下午茶'},
+  {date:'5/17',name:'百貨公司美食街',meal:'晚餐'},
+  {date:'5/18',name:'名店麵包（don blablabla / full full）',meal:'早餐'},
+  {date:'5/18',name:'Robata no Ito Okashi',meal:'午餐'},
+  {date:'5/18',name:'鈴懸 草莓大福',meal:'下午'},
+  {date:'5/19',name:'清燉牛肉麵',meal:'晚餐'},
+];
+
+const FLIGHTS=[
+  {r:"KUL → TPE",code:"JX726",dt:"5/11（一）",dep:"17:20 KUL T1",arr:"22:15 TPE T2",ac:"A321NEO",dur:"4h 55m",bag:"託運 23kg × 1 件 ｜ 手提 7kg"},
+  {r:"TPE → FUK",code:"JX840",dt:"5/12（二）",dep:"09:35 TPE T1",arr:"13:05 FUK 國際航廈",ac:"A330-900NEO",dur:"3h 30m",bag:"託運 23kg × 1 件 ｜ 手提 7kg",w:"注意是 T1！"},
+  {r:"FUK → TPE",code:"JX1841",dt:"5/19（二）",dep:"16:00 FUK 國際航廈",arr:"17:30 TPE T1",ac:"A321NEO",dur:"1h 30m",bag:"託運 23kg × 2 件 ｜ 手提 7kg"},
+  {r:"TPE → KUL",code:"JX725",dt:"5/20（三）",dep:"11:15 TPE T2",arr:"16:10 KUL T1",ac:"A321NEO",dur:"4h 55m",bag:"託運 23kg × 2 件 ｜ 手提 7kg",w:"Ynes 留台，7/1 返馬"},
+];
+const BKS=[];
+const BUSES=[];
+const CAR={
+  co:"ハコレンタカー 福岡",
+  ve:"TOYOTA Alphard SCパッケージ（6人座）",dr:"道深",
+  ph:"092-260-9506",
+  pu:"2026/5/12（二）14:30 福岡空港 国際線",
+  ad:"福岡市博多区西月隈2-10",
+  re:"2026/5/16（六）16:00 福岡空港 国際線",
+  fee:"¥67,850（已付）",
+  pickup:"落地後致電 092-260-9506，接駁車至國際線出口接客",
+  ins:"⚠️ 取車時購買 0 Excess 全險",
+  warn:"道深 取車當日必須攜帶國際駕照正本，否則無法取車！",
+};
+const HOTELS=[
+  {n:"機場背包客",loc:"台灣 桃園機場",ci:"5/11（一）深夜",co:"5/12（二）06:30",nights:"1晚",
+   ad:"桃園國際機場附近",bk:"—",ph:"—",nt:"宵夜：超商 7-Eleven / FamilyMart",
+   pay:"已付",warn:false,m:"機場背包客 桃園機場"},
+  {n:"AMANEK Beppu YULA-RE",loc:"日本 別府",ci:"5/12（二）15:00",co:"5/16（六）11:00",nights:"4晚",
+   ad:"大分縣別府市駅前本町 6-35",bk:"—",ph:"0977-21-1122",
+   nt:"自家溫泉浴池 · 不可退訂",pay:"已付",warn:false,m:"AMANEK Beppu YULA-RE"},
+  {n:"BASE LAYER HOTEL FUKUOKA",loc:"日本 福岡",ci:"5/16（六）15:00",co:"5/19（二）10:00",nights:"3晚",
+   ad:"1-14-15 Kiyokawa, Chuo Ward, Fukuoka",
+   bk:"—",ph:"+81-924061256",
+   nt:"女生房 Comfort 4人 · 男生房 Sauna Twin 2人 · 不可退",
+   pay:"現場付款",warn:false,
+   m:"BASE LAYER HOTEL FUKUOKA 清川"},
+  {n:"Elim Hotel",loc:"台灣 桃園中壢",ci:"5/19（二）約18:30",co:"5/20（三）07:00",nights:"1晚",
+   ad:"桃園市中壢區",bk:"—",ph:"—",nt:"策翔不參與台灣段",
+   pay:"已付",warn:false,m:"艾林商旅 中壢"},
+];
+const PACK={
+  "👗 衣物":[
+    "Jacket × 1（早晚較涼）",
+    "透氣 T-Shirt × 3–4（速乾）",
+    "長褲 × 2",
+    "短褲 × 1",
+    "舒適步行鞋",
+    "夾腳拖 / 輕便拖鞋（溫泉）",
+    "舊薄毛巾（溫泉後可直接丟棄）",
+  ],
+  "🧴 盥洗":[
+    "基本洗漱用品（牙刷・牙膏・洗髮乳・沐浴乳 飯店均有備）",
+    "防曬乳 SPF 50+",
+    "保濕乳液（溫泉後皮膚乾）",
+    "個人藥品（止痛/暈車/腸胃）",
+  ],
+  "📄 重要文件":[
+    "護照（效期 6 個月以上）",
+    "機票訂位確認截圖",
+    "住宿訂位確認截圖",
+    "ハコレンタカー 取車截圖",
+    "道深：國際駕照正本（⚠️ 沒有無法取車！）",
+    "旅遊保險證明",
+  ],
+  "🇯🇵 日本必備":[
+    "日幣現金（至少 ¥20,000 零花）",
+    "日本 SIM / Pocket WiFi",
+    "行動電源（地圖/拍照耗電大）",
+    "IC Card（Suica/ICOCA）",
+  ],
+};
+
+// ── 購物資料 ──
+const SHOP_AREAS=[
+  {color:'rose',ico:'🏬',name:'天神商圈',sub:'福岡市中心・地下街直通',shops:[
+    {ico:'🛒',name:'Solaria Plaza',tag:'靜宜點名',desc:'靜宜特別點名的天神核心商場',m:'Solaria Plaza 天神 福岡'},
+    {ico:'🏪',name:'Mina 天神',tag:'',desc:'GU・UNIQLO・DAISO・3COINS・LOFT・AEON・MUJI 全進駐',m:'Mina天神 福岡'},
+    {ico:'🌧️',name:'天神地下街',tag:'雨天備案',desc:'全長590m 地下商店街，雨天最佳選擇，直連大丸・三越・岩田屋・天神地鐵站',m:'天神地下街 福岡'},
+    {ico:'🍱',name:'大丸・三越＋岩田屋 B2',tag:'B2退稅',desc:'地下2F美食街 & 伴手禮 · 岩田屋新館7F辦95折卡，三越同卡共用 · B2辦理退稅',m:'岩田屋本店 天神 福岡'},
+  ]},
+  {color:'navy',ico:'🎒',name:'博多商圈',sub:'吃飯＋伴手禮一次搞定',shops:[
+    {ico:'📷',name:'友都八喜博多',tag:'',desc:'電器・玩具・相機・DAISO 齊全；樓上有 Lopia 超市，食材超值掃貨',m:'ヤマダデンキ LABI1博多 福岡'},
+    {ico:'👜',name:'博多阪急 B2 伴手禮',tag:'M3退稅',desc:'連 AMU Plaza（3F 美妝）・M3 辦退稅（護膚品・包包）',m:'博多阪急 福岡'},
+  ]},
+  {color:'forest',ico:'🌊',name:'博多運河城',sub:'Canal City Hakata',shops:[
+    {ico:'💧',name:'水舞表演',tag:'每30分一場',desc:'每半小時一次 · 晚上 9pm 場最特別（有燈光秀）· 戶外廣場 · 免費觀賞 · 附近有戶外用品店',m:'キャナルシティ博多 水舞台 福岡'},
+    {ico:'👟',name:'Alpen FUKUOKA',tag:'',desc:'2F 球鞋區，品牌齊全',m:'Alpen アウトドアーズ キャナルシティ'},
+  ]},
+  {color:'amber',ico:'🏢',name:'Lalaport 福岡',sub:'高達立像・新型商場',shops:[
+    {ico:'👟',name:'2F New Balance',tag:'3D量腳',desc:'3D 儀器測出最合腳的鞋款，體驗必試',m:'ニューバランス ららぽーと福岡'},
+    {ico:'🍜',name:'3F 清陽軒（久留米拉麵）',tag:'排隊名店',desc:'久留米是豚骨拉麵發源地，清陽軒是當地排隊名店',m:'清陽軒 ららぽーと福岡'},
+  ]},
+];
+
+const SHOP_RECOMMEND=[
+  {ico:'🍲',name:'岩田屋 B2',desc:'「茅乃舎」高湯包・茶碗蒸・岩田屋限定味噌醬',m:'岩田屋本店 天神 福岡'},
+  {ico:'🍓',name:'三越 B2',desc:'水果專賣店「hanafru」',m:'福岡三越 天神'},
+  {ico:'🌶️',name:'阪急 B1',desc:'明太子醬・特色伴手禮',m:'博多阪急 福岡'},
+  {ico:'🍮',name:'治一郎 布丁 & 年輪蛋糕',desc:'博多車站靠筑紫口側 · 直走到最後面，西雅圖咖啡左邊直走 · 消費3,000円以上享5%折扣',m:'治一郎 博多駅 福岡'},
+];
+
+const SHOP_DRUG=[
+  {ico:'🌙',name:'唐吉訶德',desc:'24小時・多家分店',m:'ドン・キホーテ 天神 福岡'},
+  {ico:'⏰',name:'MaxValue（藥妝到12am）',desc:'櫛田神社前地鐵站旁地下室',m:'マックスバリュ 天神 福岡'},
+  {ico:'💊',name:'SUGI 藥局 博多車站東店',desc:'',m:'スギ薬局 博多駅東 福岡'},
+];
+
+const SHOP_SUPERMARKET=[
+  {ico:'🛒',name:'いせや',desc:'',m:'いせや 福岡'},
+  {ico:'🛒',name:'Sunny',desc:'',m:'サニー 福岡'},
+  {ico:'🛒',name:'Trial',desc:'',m:'トライアル 福岡'},
+  {ico:'🛒',name:'Mr Max',desc:'',m:'ミスターマックス 福岡'},
+];
+
+const SHOP_COUPON=[
+  {name:'松本清',desc:'樂吃購網站領券'},
+  {name:'BigC',desc:'樂吃購網站領券'},
+  {name:'唐吉訶德',desc:'樂吃購網站領券'},
+];
+
+// ── 對話短句資料 ──
+const SCENARIOS=[
+  {id:"rest",icon:"🍽️",name:"餐廳",phrases:[
+    {jp:"これをください。",zh:"我要這個。",rm:"Kore o kudasai."},
+    {jp:"おすすめは何ですか？",zh:"有什麼推薦嗎？",rm:"Osusume wa nan desu ka?"},
+    {jp:"辛くないものをお願いします。",zh:"請給我不辣的。",rm:"Karakunai mono o onegai shimasu."},
+    {jp:"温かいものをください。",zh:"請給我熱的。",rm:"Atatakai mono o kudasai."},
+    {jp:"メニューをください。",zh:"請給我菜單。",rm:"Menyū o kudasai."},
+    {jp:"お会計をお願いします。",zh:"請結帳。",rm:"Okaikei o onegai shimasu."},
+    {jp:"領収書をください。",zh:"請給我收據。",rm:"Ryōshūsho o kudasai."},
+    {jp:"アレルギーがあります。",zh:"我有過敏。",rm:"Arerugī ga arimasu."},
+    {jp:"おいしいです！",zh:"很好吃！",rm:"Oishii desu!"},
+  ]},
+  {id:"taxi",icon:"🚕",name:"計程車",phrases:[
+    {jp:"AMANEK Beppu YULA-REまでお願いします。",zh:"請載我去 AMANEK Beppu 飯店。",rm:"AMANEK Beppu YULA-RE made onegai shimasu."},
+    {jp:"BASE LAYER HOTEL 清川までお願いします。",zh:"請載我去 BASE LAYER HOTEL。",rm:"BASE LAYER HOTEL Kiyokawa made onegai shimasu."},
+    {jp:"福岡空港までお願いします。",zh:"請載我去福岡機場。",rm:"Fukuoka kūkō made onegai shimasu."},
+    {jp:"ここで止めてください。",zh:"請在這裡停車。",rm:"Koko de tomete kudasai."},
+    {jp:"急いでいます。",zh:"我很趕時間。",rm:"Isoide imasu."},
+    {jp:"メーターでお願いします。",zh:"請用計費表計費。",rm:"Mētā de onegai shimasu."},
+    {jp:"領収書をください。",zh:"請給我收據。",rm:"Ryōshūsho o kudasai."},
+    {jp:"トランクに荷物を入れてください。",zh:"請幫我放行李進後車廂。",rm:"Toranku ni nimotsu o irete kudasai."},
+  ]},
+  {id:"pharm",icon:"💊",name:"藥局",phrases:[
+    {jp:"頭が痛いです。",zh:"我頭痛。",rm:"Atama ga itai desu."},
+    {jp:"お腹が痛いです。",zh:"我肚子痛。",rm:"Onaka ga itai desu."},
+    {jp:"熱があります。",zh:"我發燒了。",rm:"Netsu ga arimasu."},
+    {jp:"下痢をしています。",zh:"我拉肚子。",rm:"Geri o shite imasu."},
+    {jp:"吐き気がします。",zh:"我想吐。",rm:"Hakike ga shimasu."},
+    {jp:"この薬はありますか？",zh:"有這個藥嗎？",rm:"Kono kusuri wa arimasu ka?"},
+    {jp:"処方箋なしで買えますか？",zh:"沒有處方籤可以買嗎？",rm:"Shohōsen nashi de kaemasu ka?"},
+    {jp:"日本語の説明書はありますか？",zh:"有日文說明書嗎？",rm:"Nihongo no setsumeisho wa arimasu ka?"},
+  ]},
+  {id:"sos",icon:"🆘",name:"緊急",phrases:[
+    {jp:"助けてください！",zh:"救命！",rm:"Tasukete kudasai!"},
+    {jp:"救急車を呼んでください！",zh:"請叫救護車！",rm:"Kyūkyūsha o yonde kudasai!"},
+    {jp:"警察を呼んでください！",zh:"請叫警察！",rm:"Keisatsu o yonde kudasai!"},
+    {jp:"財布を盗まれました。",zh:"我的錢包被偷了。",rm:"Saifu o nusumaremashita."},
+    {jp:"パスポートをなくしました。",zh:"我的護照遺失了。",rm:"Pasupōto o nakushimashita."},
+    {jp:"日本語がわかりません。",zh:"我不懂日文。",rm:"Nihongo ga wakarimasen."},
+    {jp:"英語が話せる人はいますか？",zh:"有人會說英文嗎？",rm:"Eigo ga hanaseru hito wa imasu ka?"},
+    {jp:"大使館に連絡したいです。",zh:"我想聯絡大使館。",rm:"Taishikan ni renraku shitai desu."},
+  ]},
+  {id:"shop",icon:"🛍️",name:"購物",phrases:[
+    {jp:"これはいくらですか？",zh:"這個多少錢？",rm:"Kore wa ikura desu ka?"},
+    {jp:"試着してもいいですか？",zh:"我可以試穿嗎？",rm:"Shichaku shite mo ii desu ka?"},
+    {jp:"免税できますか？",zh:"可以退稅嗎？",rm:"Menzei dekimasu ka?"},
+    {jp:"カードで払えますか？",zh:"可以刷卡嗎？",rm:"Kādo de haraemasu ka?"},
+    {jp:"別々に包んでください。",zh:"請分開包裝（給不同人的禮物）。",rm:"Betsubetsu ni tsutsunde kudasai."},
+    {jp:"袋をください。",zh:"請給我袋子。",rm:"Fukuro o kudasai."},
+    {jp:"これを一つください。",zh:"請給我一個這個。",rm:"Kore o hitotsu kudasai."},
+    {jp:"在庫はありますか？",zh:"還有庫存嗎？",rm:"Zaiko wa arimasu ka?"},
+  ]},
+  {id:"onsen",icon:"♨️",name:"溫泉",phrases:[
+    {jp:"タオルはありますか？",zh:"有毛巾嗎？",rm:"Taoru wa arimasu ka?"},
+    {jp:"何時から何時まで入れますか？",zh:"幾點到幾點可以使用溫泉？",rm:"Nanji kara nanji made hairemasu ka?"},
+    {jp:"露天風呂はありますか？",zh:"有露天溫泉嗎？",rm:"Rotenburo wa arimasu ka?"},
+    {jp:"貴重品ロッカーはありますか？",zh:"有貴重物品置物箱嗎？",rm:"Kichōhin rokkā wa arimasu ka?"},
+    {jp:"石けんはどこですか？",zh:"肥皂在哪裡？",rm:"Sekken wa doko desu ka?"},
+    {jp:"混浴ですか？",zh:"是男女共浴嗎？",rm:"Konyoku desu ka?"},
+    {jp:"入れ墨があっても入れますか？",zh:"有紋身也可以進去嗎？",rm:"Irezumi ga atte mo hairemasu ka?"},
+    {jp:"気持ちいい！",zh:"好舒服！（泡完溫泉說）",rm:"Kimochi ii!"},
+  ]},
+  {id:"hotel",icon:"🏨",name:"住宿",phrases:[
+    {jp:"チェックインをお願いします。",zh:"我要辦理入住。",rm:"Chekkuin o onegai shimasu."},
+    {jp:"チェックアウトは何時ですか？",zh:"幾點退房？",rm:"Chekkuauto wa nanji desu ka?"},
+    {jp:"Wi-Fiのパスワードを教えてください。",zh:"請告訴我 Wi-Fi 密碼。",rm:"Waifai no pasuwādo o oshiete kudasai."},
+    {jp:"荷物を預かってもらえますか？",zh:"可以幫我保管行李嗎？",rm:"Nimotsu o azukatte moraemasu ka?"},
+    {jp:"タクシーを呼んでもらえますか？",zh:"可以幫我叫計程車嗎？",rm:"Takushī o yonde moraemasu ka?"},
+    {jp:"枕をもう一つください。",zh:"請再給我一個枕頭。",rm:"Makura o mō hitotsu kudasai."},
+    {jp:"部屋のカードが使えません。",zh:"房卡不能用了。",rm:"Heya no kādo ga tsukaemasen."},
+    {jp:"大きいスーツケースを明日空港に送りたいです。",zh:"我想明天把大行李箱送到機場（CARGO PASS）。",rm:"Ōkii sūtsukēsu o ashita kūkō ni okuritai desu."},
+  ]},
+];
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let curDay=0;
+let curScn=0;
+let packSt={};
+function loadPack(){try{packSt=JSON.parse(localStorage.getItem('ky26_pack')||'{}')}catch(e){packSt={}}}
+function savePack(){localStorage.setItem('ky26_pack',JSON.stringify(packSt))}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function murl(q){return'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)}
+function mBtn(q){return q?`<a class="map-btn" href="${murl(q)}" target="_blank">📍 地圖導航</a>`:'' }
+function row(lbl,val,cls=''){return`<div class="tc-row"><div class="tc-lbl">${lbl}</div><div class="tc-val ${cls}">${val}</div></div>`}
+
+// ═══════════════════════════════════════════════
+// RENDER: ITINERARY
+// ═══════════════════════════════════════════════
+function renderItin(){
+  document.getElementById('day-bar').innerHTML=
+    DAYS.map((d,i)=>`
+      <div class="dp ${i===curDay?'on':''}" onclick="selDay(${i})">
+        <span class="dp-date">${d.date}</span>
+        <span class="dp-lbl">${d.lbl}</span>
+      </div>`).join('');
+
+  const d=DAYS[curDay];
+  const tl=d.items.map(it=>`
+    <div class="tl-row">
+      <div class="tl-t">${it.t}</div>
+      <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div>
+        <div class="tl-card">
+          <div class="tl-head">
+            <span class="tl-ico">${it.i}</span>
+            <div class="tl-body">
+              <div class="tl-ttl${it.alert?' alert':''}">${it.n}</div>
+              ${it.d?`<div class="tl-dsc">${it.d}</div>`:''}
+              ${it.note?`<div class="tl-note">${it.note}</div>`:''}
+            </div>
+          </div>
+          ${mBtn(it.m)}
+        </div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('day-scroll').innerHTML=`
+    <div class="day-hdr">
+      <div class="day-hdr-row">
+        <div class="day-name">${d.date}（${d.wd}） ${d.lbl}</div>
+        <div class="day-wx">${d.wx}</div>
+      </div>
+      <div class="day-hi">${d.hi}</div>
+      <div class="day-cost">今日估算：${d.cost}</div>
+    </div>
+    <div class="tl">${tl}</div>
+    <div class="pad"></div>`;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER: TRANSPORT
+// ═══════════════════════════════════════════════
+function renderTrans(){
+  const fCards=FLIGHTS.map(f=>`
+    <div class="tc">
+      <div class="tc-hdr blue">
+        <span class="tc-ico">✈️</span>
+        <div class="tc-ti"><div class="tc-name">${f.code} · ${f.r}</div><div class="tc-sub">${f.dt}</div></div>
+      </div>
+      <div class="tc-body">
+        ${row('起飛',f.dep)}${row('抵達',f.arr)}
+        ${row('飛行時間',f.dur)}${row('機型',f.ac)}
+        ${f.bag?row('行李額度',f.bag):''}
+        ${f.w?row('注意',f.w,'red'):''}
+      </div>
+    </div>`).join('');
+
+  const cityRows=[
+    ['地鐵（七隈線/空港線）','¥210 起'],
+    ['西鐵電車 天神↔太宰府','¥430/人（單程）'],
+    ['計程車 天神→機場','¥2,000–2,500'],
+    ['IC Card（Suica/ICOCA）','超商/電車/巴士通用'],
+  ].map(([a,b])=>`<div class="city-row"><span class="city-name">${a}</span><span class="city-price">${b}</span></div>`).join('');
+
+  document.getElementById('t-trans').innerHTML=`
+    <div class="sec-lbl">✈️ 航班</div>
+    ${fCards}
+    <div class="sec-lbl">🚗 租車</div>
+    <div class="tc">
+      <div class="tc-hdr amber">
+        <span class="tc-ico">🚗</span>
+        <div class="tc-ti"><div class="tc-name">${CAR.co}</div><div class="tc-sub">5/12 取車 · 5/16 還車</div></div>
+      </div>
+      <div class="tc-body">
+        ${row('車型',CAR.ve)}
+        ${row('駕駛',CAR.dr)}${row('電話',CAR.ph)}
+        ${row('取車',CAR.pu)}${row('地址',CAR.ad)}
+        ${row('還車',CAR.re)}${row('費用',CAR.fee)}
+        ${row('接送',CAR.pickup)}${row('保險',CAR.ins,'red')}
+      </div>
+      <div class="warn-box">⚠️ ${CAR.warn}</div>
+    </div>
+    <div class="sec-lbl">🚇 福岡市內交通</div>
+    <div class="tc" style="margin:0 16px 12px">
+      <div class="tc-body" style="padding-top:10px">${cityRows}</div>
+    </div>
+    <div class="pad"></div>`;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER: HOTELS
+// ═══════════════════════════════════════════════
+function renderHotels(){
+  const cards=HOTELS.map(h=>`
+    <div class="hc">
+      <div class="hc-hdr">
+        <div class="hc-name">${h.n}</div>
+        <div class="hc-loc">📍 ${h.loc} · ${h.nights}</div>
+      </div>
+      ${h.warn?`<div class="hc-warn">⚠️ ${h.pay}</div>`:''}
+      <div class="hc-body">
+        <div class="hc-row"><div class="hc-lbl">入住</div><div class="hc-val">${h.ci}</div></div>
+        <div class="hc-row"><div class="hc-lbl">退房</div><div class="hc-val">${h.co}</div></div>
+        <div class="hc-row"><div class="hc-lbl">地址</div><div class="hc-val sm">${h.ad}</div></div>
+        ${h.ph!=='—'?`<div class="hc-row"><div class="hc-lbl">電話</div><div class="hc-val">${h.ph}</div></div>`:''}
+        <div class="hc-row"><div class="hc-lbl">訂位</div><div class="hc-val sm">${h.bk}</div></div>
+        ${!h.warn?`<div class="hc-row"><div class="hc-lbl">付款</div><div class="hc-val ok">${h.pay}</div></div>`:''}
+        <div class="hc-row"><div class="hc-lbl">備註</div><div class="hc-val sm">${h.nt}</div></div>
+      </div>
+      <div class="hc-foot"><a class="hc-map" href="${murl(h.m)}" target="_blank">📍 地圖導航</a></div>
+    </div>`).join('');
+  document.getElementById('t-hotel').innerHTML=`
+    <div class="sec-lbl">🏨 住宿列表</div>
+    <div style="padding:0 16px">${cards}</div>
+    <div class="pad"></div>`;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER: PACKING
+// ═══════════════════════════════════════════════
+function renderPack(){
+  loadPack();
+  const panel=document.getElementById('t-pack');
+  const sv=panel.scrollTop;
+  const all=Object.values(PACK).flat();
+  const ck=all.filter(k=>packSt[k]).length;
+  const tot=all.length;
+  const pct=Math.round(ck/tot*100);
+
+  const cats=Object.entries(PACK).map(([cat,items])=>{
+    const rows=items.map(item=>`
+      <div class="pi ${packSt[item]?'chk':''}" onclick="tgPack(${JSON.stringify(item)})">
+        <div class="pi-box"></div>
+        <div class="pi-txt">${item}</div>
+      </div>`).join('');
+    return`<div class="pack-cat"><div class="pack-cat-ttl">${cat}</div>${rows}</div>`;
+  }).join('');
+
+  panel.innerHTML=`
+    <div class="pack-prog">
+      <div class="prog-row"><span>行李準備進度</span><span>${ck} / ${tot} 項</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>
+    ${cats}
+    <div class="pack-note">住宿提供浴巾 / 拖鞋 / 吹風機<br>所有住宿有洗衣機，衣物可少帶</div>
+    <div class="pad"></div>`;
+  panel.scrollTop=sv;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER: PHRASES
+// ═══════════════════════════════════════════════
+const hasTTS=('speechSynthesis' in window);
+
+function renderPhrases(){
+  // scenario pills
+  document.getElementById('scn-bar').innerHTML=
+    SCENARIOS.map((s,i)=>`
+      <div class="sp ${i===curScn?'on':''}" onclick="selScn(${i})">
+        ${s.icon} ${s.name}
+      </div>`).join('');
+
+  if(!hasTTS){
+    document.getElementById('tts-warn').style.display='block';
+  }
+
+  const scn=SCENARIOS[curScn];
+  const cards=scn.phrases.map((p,pi)=>`
+    <div class="ph-card">
+      <div class="ph-txt">
+        <div class="ph-jp">${p.jp}</div>
+        <div class="ph-zh">${p.zh}</div>
+        <div class="ph-rm">${p.rm}</div>
+      </div>
+      ${hasTTS?`<button class="ph-voice" id="vbtn-${curScn}-${pi}" onclick="speak(${JSON.stringify(p.jp)},this)" title="語音朗讀">🔊</button>`:''}
+    </div>`).join('');
+
+  document.getElementById('phrase-scroll').innerHTML=`
+    ${cards}
+    <div class="ph-tip">點擊 🔊 按鈕，手機會以日語發音朗讀給對方聽<br>建議音量調大，直接給對方看螢幕</div>
+    <div class="pad"></div>`;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER: SHOPPING
+// ═══════════════════════════════════════════════
+function renderShop(){
+  function areaCard(a){
+    const items=a.shops.map(s=>`
+      <div class="shop-item">
+        <div class="shop-item-name">${s.ico} ${s.name}${s.tag?` <span class="shop-item-tag">${s.tag}</span>`:''}</div>
+        ${s.desc?`<div class="shop-item-desc">${s.desc}</div>`:''}
+        ${mBtn(s.m)}
+      </div>`).join('');
+    return`<div class="shop-area">
+      <div class="shop-area-hdr ${a.color}">
+        <span class="shop-area-ico">${a.ico}</span>
+        <div class="shop-area-ti"><div class="shop-area-name">${a.name}</div><div class="shop-area-sub">${a.sub}</div></div>
+      </div>${items}</div>`;
+  }
+
+  const areas=SHOP_AREAS.map(areaCard).join('');
+
+  const recRows=SHOP_RECOMMEND.map(s=>`
+    <div class="shop-item">
+      <div class="shop-item-name">${s.ico} ${s.name}</div>
+      <div class="shop-item-desc">${s.desc}</div>
+      ${mBtn(s.m)}
+    </div>`).join('');
+
+  const superRows=SHOP_SUPERMARKET.map(s=>`
+    <div class="shop-item">
+      <div class="shop-item-name">${s.ico} ${s.name}</div>
+      ${mBtn(s.m)}
+    </div>`).join('');
+
+  const drugRows=SHOP_DRUG.map(s=>`
+    <div class="shop-item">
+      <div class="shop-item-name">${s.ico} ${s.name}</div>
+      ${s.desc?`<div class="shop-item-desc">${s.desc}</div>`:''}
+      ${mBtn(s.m)}
+    </div>`).join('');
+
+  const couponRows=SHOP_COUPON.map(s=>`
+    <div class="shop-item">
+      <div class="shop-item-name">🎫 ${s.name}</div>
+      <div class="shop-item-desc">${s.desc}</div>
+    </div>`).join('');
+
+  document.getElementById('t-shop').innerHTML=`
+    <div class="sec-lbl">🏬 商圈導覽</div>
+    ${areas}
+    <div class="sec-lbl">🎁 推薦必買清單</div>
+    <div class="shop-tip-box yellow">💡 岩田屋＋三越 消費 3,000 日圓以上，享 5% 折扣優惠。新館7F辦卡，兩館共用。</div>
+    <div class="shop-area"><div class="shop-area-hdr purple"><span class="shop-area-ico">🎁</span><div class="shop-area-ti"><div class="shop-area-name">精選伴手禮</div><div class="shop-area-sub">天神 & 博多車站周邊</div></div></div>${recRows}</div>
+    <div class="sec-lbl">🏪 在地超市</div>
+    <div class="shop-area"><div class="shop-area-hdr teal"><span class="shop-area-ico">🛒</span><div class="shop-area-ti"><div class="shop-area-name">在地超市</div><div class="shop-area-sub">食材・熟食・生活雜貨</div></div></div>${superRows}</div>
+    <div class="sec-lbl">🌙 夜間購物（24H / 深夜）</div>
+    <div class="shop-area"><div class="shop-area-hdr navy"><span class="shop-area-ico">🌙</span><div class="shop-area-ti"><div class="shop-area-name">深夜購物</div><div class="shop-area-sub">唐吉訶德 24H・MaxValue 藥妝到12am</div></div></div>${drugRows}</div>
+    <div class="sec-lbl">🎫 折扣優惠</div>
+    <div class="shop-tip-box green">📱 樂吃購網站（letsgojp.com）先領優惠券，進店出示手機即享折扣</div>
+    <div class="shop-area"><div class="shop-area-hdr amber"><span class="shop-area-ico">🎫</span><div class="shop-area-ti"><div class="shop-area-name">樂吃購優惠券</div><div class="shop-area-sub">出發前下載備用</div></div></div>${couponRows}</div>
+    <div class="shop-tip-box blue">💊 藥妝折扣強度：Cosmos > SUGI > 大賀</div>
+    <div class="sec-lbl">✨ 其它</div>
+    <div class="shop-area"><div class="shop-area-hdr rose"><span class="shop-area-ico">✨</span><div class="shop-area-ti"><div class="shop-area-name">隱藏好去處</div><div class="shop-area-sub"></div></div></div>
+      <div class="shop-item">
+        <div class="shop-item-name">🍰 16ku 達克瓦茲</div>
+        <div class="shop-item-desc">福岡創世店，達克瓦茲名店</div>
+        ${mBtn('16区 ダックワーズ 福岡')}
+      </div>
+      <div class="shop-item">
+        <div class="shop-item-name">💆 Dr.stretch 按摩</div>
+        <div class="shop-item-desc">在 full full 隔壁（待確認位置）</div>
+        ${mBtn('Dr.stretch 福岡')}
+      </div>
+    </div>
+    <div class="pad"></div>`;
+}
+
+// ═══════════════════════════════════════════════
+// TTS
+// ═══════════════════════════════════════════════
+let activBtn=null;
+
+function speak(text,btn){
+  if(!hasTTS) return;
+  // cancel any ongoing speech
+  window.speechSynthesis.cancel();
+  if(activBtn){activBtn.classList.remove('speaking');activBtn.textContent='🔊';}
+  if(activBtn===btn){activBtn=null;return;}
+
+  const utt=new SpeechSynthesisUtterance(text);
+  utt.lang='ja-JP';
+  utt.rate=0.85;
+  utt.pitch=1;
+
+  // pick a Japanese voice if available
+  const voices=window.speechSynthesis.getVoices();
+  const jaVoice=voices.find(v=>v.lang.startsWith('ja'));
+  if(jaVoice) utt.voice=jaVoice;
+
+  utt.onstart=()=>{btn.classList.add('speaking');btn.textContent='⏹️';activBtn=btn;};
+  utt.onend=()=>{btn.classList.remove('speaking');btn.textContent='🔊';activBtn=null;};
+  utt.onerror=()=>{btn.classList.remove('speaking');btn.textContent='🔊';activBtn=null;};
+
+  window.speechSynthesis.speak(utt);
+}
+
+// ensure voices are loaded (Chrome loads them async)
+if(hasTTS && window.speechSynthesis.onvoiceschanged!==undefined){
+  window.speechSynthesis.onvoiceschanged=()=>{};
+}
+
+// ═══════════════════════════════════════════════
+// INTERACTIONS
+// ═══════════════════════════════════════════════
+let _curTab='itin';
+function sw(id){
+  _curTab=id;
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  if(activBtn){activBtn.classList.remove('speaking');activBtn.textContent='🔊';activBtn=null;}
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('t-'+id).classList.add('on');
+  document.getElementById('nb-'+id).classList.add('on');
+  const fab=document.getElementById('fab-add');
+  if(fab) fab.style.display=(!TRIP_ARCHIVED&&(id==='split'||id==='ynes-tw'))?'flex':'none';
+  if(id==='analysis') renderAnalysis();
+  if(id==='ynes') renderYnes();
+  if(id==='ynes-tw') renderYnesTW();
+}
+function openCtxExp(){
+  if(_curTab==='ynes-tw') openAddTWExp();
+  else openAddExp();
+}
+function selDay(i){
+  curDay=i;
+  renderItin();
+  document.getElementById('day-scroll').scrollTop=0;
+  const pills=document.querySelectorAll('.dp');
+  if(pills[i]) pills[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+function selScn(i){
+  curScn=i;
+  renderPhrases();
+  document.getElementById('phrase-scroll').scrollTop=0;
+  const pills=document.querySelectorAll('.sp');
+  if(pills[i]) pills[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+function tgPack(item){
+  packSt[item]=!packSt[item];
+  savePack();
+  renderPack();
+}
+
+// ═══════════════════════════════════════════════
+// FIREBASE 多人同步設定
+// 在 Firebase Console 建立 Realtime Database 後填入，留 null 則用本機 localStorage
+// ═══════════════════════════════════════════════
+const TRIP_ARCHIVED = true; // 旅程結束，資料唯讀
+const FIREBASE_CFG = {
+  apiKey: "AIzaSyDZjqoa-3dFgxdlm95qlySi44nvDUFt9As",
+  authDomain: "fukuoka-family-travel.firebaseapp.com",
+  databaseURL: "https://fukuoka-family-travel-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "fukuoka-family-travel",
+  storageBucket: "fukuoka-family-travel.firebasestorage.app",
+  messagingSenderId: "40690956783",
+  appId: "1:40690956783:web:75a7d91f31c6ab8acfde1a",
+};
+
+let _fbDb = null;
+let _splitCache = [];
+
+function initFirebase(){
+  if(!FIREBASE_CFG) return;
+  try{
+    const app = firebase.initializeApp(FIREBASE_CFG, 'ky26');
+    _fbDb = firebase.database(app);
+    _fbDb.ref('expenses').on('value', snap=>{
+      _splitCache = snap.val() || [];
+      renderSplit();
+    });
+  }catch(e){ console.error('Firebase 初始化失敗', e); }
+}
+
+// ═══════════════════════════════════════════════
+// SPLIT — 分帳模組
+// ═══════════════════════════════════════════════
+function getSplitData(){
+  if(_fbDb) return _splitCache;
+  try{return JSON.parse(localStorage.getItem('kyushu_split')||'[]');}catch{return[];}
+}
+function saveSplitData(d){
+  if(_fbDb){ _splitCache=d; _fbDb.ref('expenses').set(d); return; }
+  localStorage.setItem('kyushu_split',JSON.stringify(d));
+}
+function getSplitCfg(){try{return JSON.parse(localStorage.getItem('kyushu_cfg')||'{}');}catch{return {};}}
+function saveSplitCfg(c){localStorage.setItem('kyushu_cfg',JSON.stringify(c));}
+function dateToInput(d){
+  if(!d) return new Date().toISOString().split('T')[0];
+  if(/^\d{4}-/.test(d)) return d;
+  const[m,day]=d.split('/');
+  return `2026-${m.padStart(2,'0')}-${day.padStart(2,'0')}`;
+}
+function inputToDate(v){
+  if(!v) return '';
+  if(!v.includes('-')) return v;
+  const p=v.split('-');
+  return `${parseInt(p[1])}/${parseInt(p[2])}`;
+}
+function getTodayDate(){return inputToDate(new Date().toISOString().split('T')[0]);}
+
+function toMYR(amount,currency,jpyRate,ntdRate){
+  if(currency==='MYR') return amount;
+  if(currency==='JPY') return amount/(jpyRate||33);
+  if(currency==='NTD') return amount*(ntdRate||0.14);
+  return amount;
+}
+
+function renderSplit(){
+  const data=getSplitData(),cfg=getSplitCfg();
+  const rate=parseFloat(cfg.rate)||33;
+  const ntdRate=parseFloat(cfg.ntdRate)||0.14;
+  const owe={},paid={};
+  MEMBERS.forEach(m=>{owe[m]=0;paid[m]=0;});
+  data.forEach(e=>{
+    const amtMYR=toMYR(e.amount,e.currency,rate,ntdRate);
+    const s=amtMYR/e.members.length;
+    e.members.forEach(m=>{owe[m]+=s;});
+    paid[e.payer]=(paid[e.payer]||0)+amtMYR;
+  });
+  const net={};
+  MEMBERS.forEach(m=>{net[m]=(paid[m]||0)-(owe[m]||0);});
+
+  const archiveBanner=TRIP_ARCHIVED?`<div style="background:#f5f0e8;border:1px solid #e0d5c5;border-radius:10px;padding:8px 14px;margin:12px 16px 0;font-size:12px;color:#7a6f68;display:flex;align-items:center;gap:7px"><span>🔒</span><span>旅程已結束・此為封存記錄，唯讀展示</span></div>`:'';
+  const mcHTML=MEMBERS.map(m=>{
+    const n=net[m]||0;
+    const neg=n<-0.5;
+    const lbl=neg?`欠 RM${(-n).toFixed(1)}`:(n>0.5?`收 RM${n.toFixed(1)}`:'✓ 平帳');
+    const total=`共 RM${(owe[m]||0).toFixed(0)}`;
+    return `<div class="mem-card"><div class="mem-card-name">${m}</div><div class="mem-card-total">${total}</div><div class="mem-card-amt${neg?' neg':''}">${lbl}</div></div>`;
+  }).join('');
+
+  const byDate={};
+  data.forEach(e=>{if(!byDate[e.date])byDate[e.date]=[];byDate[e.date].push(e);});
+  let expHTML='';
+  if(!data.length){
+    expHTML=`<div class="empty-hint">還沒有記帳<br><small>點右下角 ＋ 新增費用</small></div>`;
+  } else {
+    Object.keys(byDate).sort((a,b)=>dateToInput(a).localeCompare(dateToInput(b))).forEach(d=>{
+      expHTML+=`<div class="exp-sec-lbl">${d}</div>`;
+      byDate[d].forEach(e=>{
+        const cat=CAT_LIST.find(c=>c.id===e.cat)||CAT_LIST[0];
+        const amtStr=e.currency==='JPY'?`¥${e.amount.toLocaleString()}`:e.currency==='NTD'?`NT$${e.amount.toLocaleString()}`:`RM${e.amount.toLocaleString()}`;
+        const myrStr=e.currency==='JPY'?`≈ RM${(e.amount/rate).toFixed(0)}`:e.currency==='NTD'?`≈ RM${(e.amount*ntdRate).toFixed(0)}`:'';
+        expHTML+=`<div class="exp-card">
+          <div class="exp-ico-w">${cat.icon}</div>
+          <div class="exp-info">
+            <div class="exp-name">${e.name}</div>
+            <div class="exp-sub">付：${e.payer} · ${e.members.length===1?`<span class="exp-solo">個人</span>`:`${e.members.length}人`} · ${e.members.join('、')}</div>
+            ${e.note?`<div class="exp-nt">${e.note}</div>`:''}
+          </div>
+          <div class="exp-right">
+            <div class="exp-jpy">${amtStr}</div>
+            ${myrStr?`<div class="exp-myr">${myrStr}</div>`:''}
+            ${TRIP_ARCHIVED?'':` <button class="exp-del-btn" onclick="openEditExp('${e.id}')" style="color:var(--pri)">✏️</button>
+            <button class="exp-del-btn" onclick="delExp('${e.id}')">🗑️</button>`}
+          </div>
+        </div>`;
+      });
+    });
+  }
+
+  let settleHTML='';
+  if(data.length){
+    const txns=calcSettlement(net);
+    const totalMYR=data.reduce((s,e)=>s+toMYR(e.amount,e.currency,rate,ntdRate),0);
+    settleHTML=`<div class="settle-box">
+      <div class="settle-hd">💸 如何結清（總花費 RM${totalMYR.toFixed(0)} ≈ ¥${Math.round(totalMYR*rate).toLocaleString()}）</div>
+      ${!txns.length?'<div style="font-size:13px;color:var(--grn)">✅ 已全部結清！</div>':
+        `<div style="font-size:11px;color:var(--txt2);margin-bottom:6px">以下為最少步驟轉帳方案 👇</div>`+
+        txns.map(t=>`<div class="settle-row">
+          <span><strong>${t.from}</strong> 轉給 <strong>${t.to}</strong></span>
+          <span class="settle-val"><span class="settle-jpy">RM ${t.amount.toFixed(1)}</span><span class="settle-rm">≈ ¥${Math.round(t.amount*rate).toLocaleString()}</span></span>
+        </div>`).join('')}
+    </div>
+    <button class="share-btn" onclick="shareSummary()">📤 複製結算清單 · 傳 WhatsApp</button>`;
+  }
+
+  const syncBadge=_fbDb
+    ?'<span class="sync-badge">☁️ 雲端同步</span>'
+    :'<span class="sync-badge sync-off">📱 本機</span>';
+  document.getElementById('t-split').innerHTML=`
+    <div class="split-hdr">
+      <div class="split-ttl">💰 旅遊分帳${syncBadge}</div>
+      <button class="gear-btn" onclick="openCfg()">⚙️</button>
+    </div>
+    ${archiveBanner}
+    <div class="mem-cards">${mcHTML}</div>
+    <div class="split-scroll">
+      ${settleHTML}${expHTML}
+      <div style="height:90px"></div>
+    </div>`;
+}
+
+function calcSettlement(net){
+  const cr=[],db=[];
+  MEMBERS.forEach(m=>{
+    const n=net[m]||0;
+    if(n>0.5) cr.push({name:m,amt:n});
+    else if(n<-0.5) db.push({name:m,amt:-n});
+  });
+  const txns=[],c=cr.map(x=>({...x})),d=db.map(x=>({...x}));
+  let ci=0,di=0;
+  while(ci<c.length&&di<d.length){
+    const p=Math.min(c[ci].amt,d[di].amt);
+    if(p>0.5) txns.push({from:d[di].name,to:c[ci].name,amount:p});
+    c[ci].amt-=p; d[di].amt-=p;
+    if(c[ci].amt<0.5) ci++;
+    if(d[di].amt<0.5) di++;
+  }
+  return txns;
+}
+
+function shareSummary(){
+  const data=getSplitData(),cfg=getSplitCfg();
+  const rate=parseFloat(cfg.rate)||33;
+  const ntdRate=parseFloat(cfg.ntdRate)||0.14;
+  const owe={},net={};
+  MEMBERS.forEach(m=>{owe[m]=0;net[m]=0;});
+  data.forEach(e=>{
+    const amtMYR=toMYR(e.amount,e.currency,rate,ntdRate);
+    const s=amtMYR/e.members.length;
+    e.members.forEach(m=>{owe[m]+=s;net[m]-=s;});
+    net[e.payer]+=amtMYR;
+  });
+  const txns=calcSettlement(net);
+  const totalMYR=data.reduce((s,e)=>s+toMYR(e.amount,e.currency,rate,ntdRate),0);
+  let txt=`🌸 北九州・別府溫泉・福岡漫遊 分帳結算\n總花費：RM${totalMYR.toFixed(0)}（≈ ¥${Math.round(totalMYR*rate).toLocaleString()}）\n\n💸 結清方式：\n`;
+  if(!txns.length) txt+='全部已結清 🎉\n';
+  else txns.forEach(t=>{txt+=`${t.from} 轉帳給 ${t.to}：RM${t.amount.toFixed(1)}（≈ ¥${Math.round(t.amount*rate).toLocaleString()}）\n`;});
+  txt+=`\n各人應付花費：\n`;
+  MEMBERS.forEach(m=>{txt+=`${m}：RM${owe[m].toFixed(1)}（≈ ¥${Math.round(owe[m]*rate).toLocaleString()}）\n`;});
+  navigator.clipboard?.writeText(txt).then(()=>alert('已複製，貼到 WhatsApp 即可 📲')).catch(()=>{
+    const el=document.createElement('textarea');el.value=txt;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);
+    alert('已複製，貼到 WhatsApp 即可 📲');
+  });
+}
+
+function delExp(id){
+  if(!confirm('刪除這筆費用？'))return;
+  saveSplitData(getSplitData().filter(e=>e.id!==id));
+  renderSplit();
+}
+
+let mst={cat:'food',src:'list',members:[...MEMBERS],payer:'Ynes',name:'',amount:'',currency:'JPY',date:getTodayDate(),note:'',editId:null};
+
+function openAddExp(){
+  mst={cat:'food',src:'list',members:[...MEMBERS],payer:'Ynes',name:'',amount:'',currency:'JPY',date:getTodayDate(),note:'',editId:null};
+  document.getElementById('m-add-title').textContent='新增費用';
+  buildModal();
+  document.getElementById('m-add').classList.add('open');
+}
+
+function openEditExp(id){
+  const exp=getSplitData().find(e=>e.id===id);
+  if(!exp) return;
+  mst={cat:exp.cat||'food',src:'manual',members:[...exp.members],payer:exp.payer,
+    name:exp.name,amount:exp.amount,currency:exp.currency||'JPY',
+    date:exp.date||'5/13',note:exp.note||'',editId:id};
+  document.getElementById('m-add-title').textContent='編輯費用';
+  buildModal();
+  document.getElementById('m-add').classList.add('open');
+}
+
+function captureFormState(){
+  const n=mst.src==='list'?document.getElementById('m-rest'):document.getElementById('m-name');
+  if(n) mst.name=n.value;
+  const a=document.getElementById('m-amt');if(a) mst.amount=a.value;
+  const c=document.getElementById('m-cur');if(c) mst.currency=c.value;
+  const d=document.getElementById('m-date');if(d&&d.value) mst.date=inputToDate(d.value)||mst.date;
+  const nt=document.getElementById('m-note');if(nt) mst.note=nt.value;
+}
+
+function closeModals(){
+  document.getElementById('m-add').classList.remove('open');
+  document.getElementById('m-cfg').classList.remove('open');
+}
+
+function handleOvClick(e){if(e.target.classList.contains('m-ov'))closeModals();}
+
+function buildModal(){
+  const catHTML=CAT_LIST.map(c=>`<div class="cat-btn${mst.cat===c.id?' on':''}" onclick="setMCat('${c.id}')">${c.icon}<span class="cat-lbl">${c.lbl}</span></div>`).join('');
+  const srcHTML=[{id:'list',ico:'📋',lbl:'從行程選'},{id:'manual',ico:'✏️',lbl:'手動輸入'},{id:'photo',ico:'📷',lbl:'拍照辨識'}]
+    .map(s=>`<div class="src-btn${mst.src===s.id?' on':''}" onclick="setMSrc('${s.id}')"><span class="s-ico">${s.ico}</span>${s.lbl}</div>`).join('');
+  const nameHTML=mst.src==='list'
+    ?`<select class="m-sel" id="m-rest" onchange="onRestPick(this)"><option value="">請選擇…</option>${REST_LIST.map(r=>`<option value="${r.name}" data-date="${r.date}">${r.date} ${r.meal} · ${r.name}</option>`).join('')}</select>`
+    :`<input class="m-inp" id="m-name" type="text" placeholder="店名 / 費用名稱">`;
+  const photoHTML=mst.src==='photo'?`
+    <div class="m-lbl">上傳收據照片</div>
+    <input type="file" id="photo-file" accept="image/*" capture="environment" style="display:none" onchange="onPhoto(this)">
+    <button onclick="document.getElementById('photo-file').click()" style="width:100%;padding:10px;border:1.5px dashed var(--bdr);border-radius:10px;background:var(--bg);font-size:14px;color:var(--txt2);cursor:pointer;font-family:inherit">📷 拍照 / 選擇圖片</button>
+    <img id="photo-prev">
+    <div id="ocr-spin" class="ocr-spin">🔍 AI 辨識中…</div>`:'';
+  const memHTML=MEMBERS.map(m=>`<div class="mc${mst.members.includes(m)?' on':''}" onclick="togMem('${m}')"><div class="mc-dot">✓</div><span class="mc-lbl">${m}</span></div>`).join('');
+  const payHTML=MEMBERS.map(m=>`<div class="pay-btn${mst.payer===m?' on':''}" onclick="setPayer('${m}')">${m}</div>`).join('');
+  document.getElementById('m-add-body').innerHTML=`
+    <div class="m-lbl">費用類型</div><div class="cat-row">${catHTML}</div>
+    <div class="m-lbl">來源</div><div class="src-row">${srcHTML}</div>
+    ${photoHTML}
+    <div class="m-lbl">名稱</div>${nameHTML}
+    <div class="m-lbl">金額</div>
+    <div class="cur-grp">
+      <select class="cur-sel" id="m-cur"><option value="JPY">¥ JPY</option><option value="NTD">NT$</option><option value="MYR">RM</option></select>
+      <input class="m-inp" id="m-amt" type="number" placeholder="0" style="flex:1">
+    </div>
+    <div class="m-lbl">日期</div><input class="m-inp" type="date" id="m-date" min="2026-05-11">
+    <div class="m-lbl">誰付帳？</div><div class="payer-row">${payHTML}</div>
+    <div class="m-lbl">誰參與？ <span class="sel-all" onclick="togAllMem()">全選 / 全消</span> · <span class="sel-all" onclick="soloExp()">只有付款人</span></div>
+    <div class="mem-grid">${memHTML}</div>
+    <div class="m-lbl">備註（選填）</div>
+    <input class="m-inp" id="m-note" type="text" placeholder="例：含服務費">
+    <button class="sub-btn" id="sub-btn" onclick="submitExp()">${mst.editId?'儲存修改':'確認加入'}</button>`;
+  if(mst.src!=='list'){const _n=document.getElementById('m-name');if(_n)_n.value=mst.name||'';}
+  const _a=document.getElementById('m-amt');if(_a)_a.value=mst.amount||'';
+  const _c=document.getElementById('m-cur');if(_c)_c.value=mst.currency||'JPY';
+  const _d=document.getElementById('m-date');if(_d)_d.value=dateToInput(mst.date||getTodayDate());
+  const _nt=document.getElementById('m-note');if(_nt)_nt.value=mst.note||'';
+}
+
+function setMCat(id){captureFormState();mst.cat=id;buildModal();}
+function setMSrc(id){captureFormState();mst.src=id;buildModal();}
+function togMem(m){
+  mst.members=mst.members.includes(m)?mst.members.filter(x=>x!==m):[...mst.members,m];
+  document.querySelectorAll('.mc').forEach(el=>el.classList.toggle('on',mst.members.includes(el.querySelector('.mc-lbl').textContent)));
+}
+function togAllMem(){
+  mst.members=mst.members.length===MEMBERS.length?[]:[...MEMBERS];
+  document.querySelectorAll('.mc').forEach(el=>el.classList.toggle('on',mst.members.includes(el.querySelector('.mc-lbl').textContent)));
+}
+function soloExp(){
+  mst.members=[mst.payer];
+  document.querySelectorAll('.mc').forEach(el=>el.classList.toggle('on',el.querySelector('.mc-lbl').textContent===mst.payer));
+}
+function setPayer(m){
+  mst.payer=m;
+  document.querySelectorAll('.pay-btn').forEach(el=>el.classList.toggle('on',el.textContent===m));
+}
+function onRestPick(sel){
+  const opt=sel.options[sel.selectedIndex];
+  if(opt.dataset.date){const d=document.getElementById('m-date');if(d)d.value=opt.dataset.date;}
+}
+
+async function onPhoto(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    const url=e.target.result;
+    const prev=document.getElementById('photo-prev');
+    prev.src=url;prev.style.display='block';
+    const cfg=getSplitCfg();
+    if(!cfg.apiKey){alert('請先設定 Anthropic API Key（點右上角 ⚙️）');return;}
+    const spin=document.getElementById('ocr-spin'),btn=document.getElementById('sub-btn');
+    spin.style.display='block';btn.disabled=true;
+    try{
+      const r=await callOCR(url.split(',')[1],file.type||'image/jpeg');
+      if(r){
+        const n=document.getElementById('m-name'),a=document.getElementById('m-amt');
+        if(r.name&&n)n.value=r.name;
+        if(r.amount&&a)a.value=r.amount;
+      }
+    }catch{alert('辨識失敗，請手動輸入');}
+    finally{spin.style.display='none';btn.disabled=false;}
+  };
+  reader.readAsDataURL(file);
+}
+
+async function callOCR(b64,mime){
+  const cfg=getSplitCfg();
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':cfg.apiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({
+      model:'claude-haiku-4-5-20251001',
+      max_tokens:200,
+      messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+        {type:'text',text:'這是日本餐廳收據，請辨識：1)店家名稱（翻成繁體中文）2)總金額（日圓，只要數字）。只回傳JSON格式：{"name":"店名","amount":1234}，無法辨識用null。'}
+      ]}]
+    })
+  });
+  const d=await res.json();
+  if(d.error)throw new Error(d.error.message);
+  const txt=d.content?.[0]?.text||'';
+  const m=txt.match(/\{[^}]+\}/);
+  if(m){try{return JSON.parse(m[0]);}catch{}}
+  return null;
+}
+
+function submitExp(){
+  let name='',amt=0,cur='JPY',date='',note='';
+  if(mst.src==='list') name=document.getElementById('m-rest')?.value||'';
+  else name=(document.getElementById('m-name')?.value||'').trim();
+  amt=parseFloat(document.getElementById('m-amt')?.value)||0;
+  cur=document.getElementById('m-cur')?.value||'JPY';
+  date=inputToDate(document.getElementById('m-date')?.value)||getTodayDate();
+  note=(document.getElementById('m-note')?.value||'').trim();
+  if(!name){alert('請輸入名稱');return;}
+  if(!amt){alert('請輸入金額');return;}
+  if(!mst.members.length){alert('請選擇參與成員');return;}
+  const data=getSplitData();
+  if(mst.editId){
+    const idx=data.findIndex(e=>e.id===mst.editId);
+    if(idx!==-1) data[idx]={...data[idx],date,name,amount:amt,currency:cur,cat:mst.cat,payer:mst.payer,members:[...mst.members],note};
+  } else {
+    data.push({id:Date.now().toString(),date,name,amount:amt,currency:cur,cat:mst.cat,payer:mst.payer,members:[...mst.members],note});
+  }
+  saveSplitData(data);
+  closeModals();
+  renderSplit();
+}
+
+function openCfg(){
+  const cfg=getSplitCfg();
+  document.getElementById('cfg-key').value=cfg.apiKey||'';
+  document.getElementById('cfg-rate').value=cfg.rate||'33';
+  document.getElementById('cfg-ntd-rate').value=cfg.ntdRate||'0.14';
+  document.getElementById('m-cfg').classList.add('open');
+}
+function saveCfg(){
+  const key=(document.getElementById('cfg-key').value||'').trim();
+  const rate=(document.getElementById('cfg-rate').value||'33').trim();
+  const ntdRate=(document.getElementById('cfg-ntd-rate').value||'0.14').trim();
+  saveSplitCfg({apiKey:key,rate,ntdRate});
+  closeModals();
+  renderSplit();
+  alert('設定已儲存 ✓');
+}
+
+// ═══════════════════════════════════════════════
+// ANALYTICS — 日本行程 5/11–5/19
+// ═══════════════════════════════════════════════
+function renderAnalysis(){
+  const data=getSplitData(),cfg=getSplitCfg();
+  const rate=parseFloat(cfg.rate)||33,ntdRate=parseFloat(cfg.ntdRate)||0.14;
+  const el=document.getElementById('t-analysis');
+  if(!data.length){el.innerHTML=`<div class="empty-hint" style="padding-top:80px">還沒有記帳資料<br><small>先到分帳頁新增費用</small></div>`;return;}
+
+  // === 僅統計日本行程 5/11–5/19 ===
+  const jpData=data.filter(e=>{const d=dateToInput(e.date);return d>='2026-05-11'&&d<='2026-05-19';});
+  if(!jpData.length){el.innerHTML=`<div class="empty-hint" style="padding-top:80px">日本行程（5/11–5/19）<br>尚無記帳資料</div>`;return;}
+
+  // 總花費
+  const totalMYR=jpData.reduce((s,e)=>s+toMYR(e.amount,e.currency,rate,ntdRate),0);
+  const sharedData=jpData.filter(e=>e.members.length>1);
+  const soloData=jpData.filter(e=>e.members.length===1);
+  const sharedTotal=sharedData.reduce((s,e)=>s+toMYR(e.amount,e.currency,rate,ntdRate),0);
+  const soloTotal=soloData.reduce((s,e)=>s+toMYR(e.amount,e.currency,rate,ntdRate),0);
+
+  // 各人：個人費用（solo）
+  const soloByMem={};MEMBERS.forEach(m=>soloByMem[m]=0);
+  soloData.forEach(e=>{if(e.members[0] in soloByMem) soloByMem[e.members[0]]+=toMYR(e.amount,e.currency,rate,ntdRate);});
+
+  // 各人：共攤份額
+  const shareByMem={};MEMBERS.forEach(m=>shareByMem[m]=0);
+  sharedData.forEach(e=>{
+    const a=toMYR(e.amount,e.currency,rate,ntdRate)/e.members.length;
+    e.members.forEach(m=>{if(m in shareByMem) shareByMem[m]+=a;});
+  });
+
+  // 各人：總應付
+  const oweByMem={};MEMBERS.forEach(m=>oweByMem[m]=(soloByMem[m]||0)+(shareByMem[m]||0));
+  const maxOwe=Math.max(...Object.values(oweByMem),1);
+  const membersBar=MEMBERS.map(m=>`
+    <div class="bar-row">
+      <div class="bar-lbl">${m}</div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${((oweByMem[m]/maxOwe)*100).toFixed(0)}%"></div></div>
+      <div class="bar-val">RM ${oweByMem[m].toFixed(0)}</div>
+    </div>`).join('');
+
+  // 各人：個人費用 bar（solo only）
+  const hasSolo=Object.values(soloByMem).some(v=>v>0);
+  const maxSolo=Math.max(...Object.values(soloByMem),1);
+  const soloBar=MEMBERS.filter(m=>soloByMem[m]>0).map(m=>`
+    <div class="bar-row">
+      <div class="bar-lbl">${m}</div>
+      <div class="bar-wrap"><div class="bar-fill grn" style="width:${((soloByMem[m]/maxSolo)*100).toFixed(0)}%"></div></div>
+      <div class="bar-val">RM ${soloByMem[m].toFixed(0)}</div>
+    </div>`).join('');
+
+  // 類別
+  const catSpend={};CAT_LIST.forEach(c=>catSpend[c.id]=0);
+  jpData.forEach(e=>{catSpend[e.cat]=(catSpend[e.cat]||0)+toMYR(e.amount,e.currency,rate,ntdRate);});
+  const catsUsed=CAT_LIST.filter(c=>catSpend[c.id]>0).sort((a,b)=>catSpend[b.id]-catSpend[a.id]);
+  const maxCat=Math.max(...catsUsed.map(c=>catSpend[c.id]),1);
+  const catBar=catsUsed.map(c=>`<div class="bar-row"><div class="bar-lbl" style="text-align:center;font-size:15px">${c.icon}</div><div class="bar-wrap"><div class="bar-fill grn" style="width:${((catSpend[c.id]/maxCat)*100).toFixed(0)}%"></div></div><div class="bar-val">RM ${catSpend[c.id].toFixed(0)}</div></div>`).join('');
+
+  // 每日花費
+  const daySpend={};
+  jpData.forEach(e=>{const a=toMYR(e.amount,e.currency,rate,ntdRate);daySpend[e.date]=(daySpend[e.date]||0)+a;});
+  const sortedDays=Object.keys(daySpend).sort((a,b)=>dateToInput(a).localeCompare(dateToInput(b)));
+  const maxDay=Math.max(...Object.values(daySpend),1);
+  const dayBar=sortedDays.map(d=>`<div class="bar-row"><div class="bar-lbl">${d}</div><div class="bar-wrap"><div class="bar-fill" style="width:${((daySpend[d]/maxDay)*100).toFixed(0)}%"></div></div><div class="bar-val">RM ${daySpend[d].toFixed(0)}</div></div>`).join('');
+
+  // 幣別
+  const curSpend={JPY:0,NTD:0,MYR:0};
+  jpData.forEach(e=>{curSpend[e.currency]=(curSpend[e.currency]||0)+e.amount;});
+  const curHTML=Object.entries(curSpend).filter(([,v])=>v>0).map(([cur,amt])=>{
+    const sym=cur==='JPY'?'¥':cur==='NTD'?'NT$':'RM';
+    return `<div class="an-stat-row"><span class="an-stat-lbl">${sym} ${cur}</span><span class="an-stat-val">${sym}${Math.round(amt).toLocaleString()}</span></div>`;
+  }).join('');
+  const rateRow=`<div class="an-stat-row"><span class="an-stat-lbl" style="color:var(--txt3)">換算匯率</span><span class="an-stat-val" style="color:var(--txt3);font-size:12px">¥1 = RM${(1/rate).toFixed(3)} · NT$1 = RM${ntdRate}</span></div>`;
+
+  // === Ynes 專區 ===
+  const YNES='Ynes';
+  const ynesJpData=jpData.filter(e=>e.members.includes(YNES));
+  const ynesSolo=ynesJpData.filter(e=>e.members.length===1);
+  const ynesShared=ynesJpData.filter(e=>e.members.length>1);
+  const ynesSoloMYR=ynesSolo.reduce((s,e)=>s+toMYR(e.amount,e.currency,rate,ntdRate),0);
+  const ynesSharedMYR=ynesShared.reduce((s,e)=>s+toMYR(e.amount,e.currency,rate,ntdRate)/e.members.length,0);
+  const ynesTotalMYR=ynesSoloMYR+ynesSharedMYR;
+  // Ynes 類別
+  const ynCatSpend={};CAT_LIST.forEach(c=>ynCatSpend[c.id]=0);
+  ynesJpData.forEach(e=>{const a=toMYR(e.amount,e.currency,rate,ntdRate)/e.members.length;ynCatSpend[e.cat]=(ynCatSpend[e.cat]||0)+a;});
+  const ynCatsUsed=CAT_LIST.filter(c=>ynCatSpend[c.id]>0).sort((a,b)=>ynCatSpend[b.id]-ynCatSpend[a.id]);
+  const ynMaxCat=Math.max(...ynCatsUsed.map(c=>ynCatSpend[c.id]),1);
+  const ynCatBar=ynCatsUsed.map(c=>`<div class="bar-row"><div class="bar-lbl" style="text-align:center;font-size:15px">${c.icon}</div><div class="bar-wrap"><div class="bar-fill" style="width:${((ynCatSpend[c.id]/ynMaxCat)*100).toFixed(0)}%"></div></div><div class="bar-val">RM ${ynCatSpend[c.id].toFixed(0)}</div></div>`).join('');
+  // Ynes 個人費用明細（solo only）
+  const ynesSoloList=ynesSolo.length
+    ?[...ynesSolo].sort((a,b)=>dateToInput(a.date).localeCompare(dateToInput(b.date))).map(e=>{
+      const cat=CAT_LIST.find(c=>c.id===e.cat)||CAT_LIST[0];
+      const amtStr=e.currency==='JPY'?`¥${e.amount.toLocaleString()}`:e.currency==='NTD'?`NT$${e.amount.toLocaleString()}`:`RM${e.amount.toLocaleString()}`;
+      const myrStr=e.currency!=='MYR'?`≈ RM${toMYR(e.amount,e.currency,rate,ntdRate).toFixed(0)}`:'';
+      return `<div class="exp-card" style="margin:0 0 6px"><div class="exp-ico-w">${cat.icon}</div><div class="exp-info"><div class="exp-name">${e.name}</div><div class="exp-sub">${e.date}${e.note?' · '+e.note:''}</div></div><div class="exp-right"><div class="exp-jpy">${amtStr}</div>${myrStr?`<div class="exp-myr">${myrStr}</div>`:''}</div></div>`;
+    }).join('')
+    :'';
+
+  el.innerHTML=`<div class="an-scroll"><div style="height:12px"></div>
+
+    <div class="an-card">
+      <div class="an-ttl">🌸 日本行程總覽（5/11–5/19）</div>
+      <div class="an-hero">
+        <div class="an-hero-num">RM ${totalMYR.toFixed(0)}</div>
+        <div class="an-hero-sub">總花費 ≈ ¥${Math.round(totalMYR*rate).toLocaleString()} · ${jpData.length} 筆</div>
+        <div class="an-hero-sub">人均 RM ${(totalMYR/MEMBERS.length).toFixed(0)}</div>
+      </div>
+      <div class="mini-cards">
+        <div class="mini-card"><div class="mini-card-lbl">共同費用</div><div class="mini-card-val">RM ${sharedTotal.toFixed(0)}</div><div class="mini-card-sub">${sharedData.length} 筆</div></div>
+        <div class="mini-card"><div class="mini-card-lbl">個人費用</div><div class="mini-card-val grn">RM ${soloTotal.toFixed(0)}</div><div class="mini-card-sub">${soloData.length} 筆</div></div>
+      </div>
+    </div>
+
+    <div class="an-card"><div class="an-ttl">💴 幣別原始金額</div>${curHTML}${rateRow}</div>
+
+    <div class="an-card"><div class="an-ttl">👥 各人總應付（個人 + 分攤）</div>${membersBar}</div>
+
+    <div class="an-card">
+      <div class="an-ttl">🧾 各人個人費用（solo 消費）</div>
+      ${hasSolo?soloBar:'<div style="font-size:13px;color:var(--txt3);padding:4px 0">尚無個人費用記錄</div>'}
+    </div>
+
+    <div class="an-card" style="border:1.5px solid rgba(193,127,74,.3)">
+      <div class="an-ttl">👤 Ynes 花費明細（日本）</div>
+      <div class="an-hero" style="padding:4px 0 8px">
+        <div class="an-hero-num">RM ${ynesTotalMYR.toFixed(0)}</div>
+        <div class="an-hero-sub">≈ ¥${Math.round(ynesTotalMYR*rate).toLocaleString()} · ${ynesJpData.length} 筆</div>
+      </div>
+      <div class="mini-cards" style="margin-bottom:${ynCatBar?'12':'4'}px">
+        <div class="mini-card"><div class="mini-card-lbl">個人獨享</div><div class="mini-card-val">RM ${ynesSoloMYR.toFixed(0)}</div><div class="mini-card-sub">${ynesSolo.length} 筆</div></div>
+        <div class="mini-card"><div class="mini-card-lbl">與大家共攤</div><div class="mini-card-val grn">RM ${ynesSharedMYR.toFixed(0)}</div><div class="mini-card-sub">${ynesShared.length} 筆</div></div>
+      </div>
+      ${ynCatBar?`<div class="an-ttl" style="margin-top:2px;margin-bottom:6px">類別明細</div>${ynCatBar}`:''}
+      ${ynesSoloList?`<div class="an-ttl" style="margin-top:10px;margin-bottom:8px">個人費用明細</div>${ynesSoloList}`:''}
+    </div>
+
+    <div class="an-card"><div class="an-ttl">📅 每日花費</div>${dayBar}</div>
+    <div class="an-card"><div class="an-ttl">🏷️ 類別分析</div>${catBar||'<div style="font-size:13px;color:var(--txt3)">尚無資料</div>'}</div>
+
+    <div style="height:80px"></div>
+  </div>`;
+}
+
+function renderYnes(){
+  const YNES='Ynes';
+  const data=getSplitData(),cfg=getSplitCfg();
+  const rate=parseFloat(cfg.rate)||33,ntdRate=parseFloat(cfg.ntdRate)||0.14;
+  const el=document.getElementById('t-ynes');
+  if(!data.length){el.innerHTML=`<div class="empty-hint" style="padding-top:80px">還沒有記帳資料</div>`;return;}
+
+  const personalExp=data.filter(e=>e.members.length===1&&e.members[0]===YNES);
+  const sharedExp=data.filter(e=>e.members.length>1&&e.members.includes(YNES));
+  const personalMYR=personalExp.reduce((s,e)=>s+toMYR(e.amount,e.currency,rate,ntdRate),0);
+  const sharedMYR=sharedExp.reduce((s,e)=>s+toMYR(e.amount,e.currency,rate,ntdRate)/e.members.length,0);
+  const grandTotal=personalMYR+sharedMYR;
+
+  // category breakdown
+  const catSpend={};
+  data.filter(e=>e.members.includes(YNES)).forEach(e=>{
+    const a=toMYR(e.amount,e.currency,rate,ntdRate)/e.members.length;
+    catSpend[e.cat]=(catSpend[e.cat]||0)+a;
+  });
+  const catsUsed=CAT_LIST.filter(c=>catSpend[c.id]>0).sort((a,b)=>catSpend[b.id]-catSpend[a.id]);
+  const maxCat=Math.max(...catsUsed.map(c=>catSpend[c.id]),1);
+  const catBar=catsUsed.map(c=>`<div class="bar-row"><div class="bar-lbl" style="text-align:center;font-size:15px">${c.icon}</div><div class="bar-wrap"><div class="bar-fill grn" style="width:${((catSpend[c.id]/maxCat)*100).toFixed(0)}%"></div></div><div class="bar-val">RM ${catSpend[c.id].toFixed(0)}</div></div>`).join('');
+
+  // daily breakdown (all Ynes expenses)
+  const daySpend={};
+  data.filter(e=>e.members.includes(YNES)).forEach(e=>{
+    const a=toMYR(e.amount,e.currency,rate,ntdRate)/e.members.length;
+    daySpend[e.date]=(daySpend[e.date]||0)+a;
+  });
+  const sortedDays=Object.keys(daySpend).sort((a,b)=>dateToInput(a).localeCompare(dateToInput(b)));
+  const maxDay=Math.max(...Object.values(daySpend),1);
+  const dayBar=sortedDays.map(d=>`<div class="bar-row"><div class="bar-lbl">${d}</div><div class="bar-wrap"><div class="bar-fill" style="width:${((daySpend[d]/maxDay)*100).toFixed(0)}%"></div></div><div class="bar-val">RM ${daySpend[d].toFixed(0)}</div></div>`).join('');
+
+  // personal expense list
+  const pList=personalExp.length
+    ?[...personalExp].sort((a,b)=>dateToInput(a.date).localeCompare(dateToInput(b.date))).map(e=>{
+      const cat=CAT_LIST.find(c=>c.id===e.cat)||CAT_LIST[0];
+      const amtStr=e.currency==='JPY'?`¥${e.amount.toLocaleString()}`:e.currency==='NTD'?`NT$${e.amount.toLocaleString()}`:`RM${e.amount.toLocaleString()}`;
+      const myrStr=e.currency!=='MYR'?`≈ RM${toMYR(e.amount,e.currency,rate,ntdRate).toFixed(0)}`:'';
+      return `<div class="exp-card"><div class="exp-ico-w">${cat.icon}</div><div class="exp-info"><div class="exp-name">${e.name}</div><div class="exp-sub">${e.date}${e.note?' · '+e.note:''}</div></div><div class="exp-right"><div class="exp-jpy">${amtStr}</div>${myrStr?`<div class="exp-myr">${myrStr}</div>`:''}</div></div>`;
+    }).join('')
+    :`<div class="empty-hint" style="padding:20px 16px">還沒有個人費用<br><small>新增費用時點「只有付款人」</small></div>`;
+
+  el.innerHTML=`<div class="an-scroll"><div style="height:12px"></div>
+    <div class="an-card">
+      <div class="an-hero">
+        <div class="an-hero-num">RM ${grandTotal.toFixed(0)}</div>
+        <div class="an-hero-sub">Ynes 這趟旅程總花費（≈ ¥${Math.round(grandTotal*rate).toLocaleString()}）</div>
+      </div>
+      <div class="mini-cards">
+        <div class="mini-card"><div class="mini-card-lbl">個人費用</div><div class="mini-card-val">RM ${personalMYR.toFixed(0)}</div><div class="mini-card-sub">${personalExp.length} 筆</div></div>
+        <div class="mini-card"><div class="mini-card-lbl">分攤份額</div><div class="mini-card-val grn">RM ${sharedMYR.toFixed(0)}</div><div class="mini-card-sub">${sharedExp.length} 筆</div></div>
+      </div>
+    </div>
+    <div class="an-card"><div class="an-ttl">🏷️ 類別花費</div>${catBar||'<div style="font-size:13px;color:var(--txt3)">尚無資料</div>'}</div>
+    <div class="an-card"><div class="an-ttl">📅 每日花費</div>${dayBar||'<div style="font-size:13px;color:var(--txt3)">尚無資料</div>'}</div>
+    <div class="sec-lbl">🧾 個人費用明細</div>
+    ${pList}
+    <div style="height:80px"></div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// YNES 台灣花費（5/21 起）
+// ═══════════════════════════════════════════════
+function openAddTWExp(){
+  mst={cat:'food',src:'manual',members:['Ynes'],payer:'Ynes',name:'',amount:'',currency:'NTD',date:'5/21',note:'',editId:null};
+  document.getElementById('m-add-title').textContent='新增台灣費用';
+  buildModal();
+  document.getElementById('m-add').classList.add('open');
+}
+
+function renderYnesTW(){
+  const YNES='Ynes';
+  const data=getSplitData(),cfg=getSplitCfg();
+  const rate=parseFloat(cfg.rate)||33,ntdRate=parseFloat(cfg.ntdRate)||0.14;
+  const el=document.getElementById('t-ynes-tw');
+
+  // 只抓 5/21 以後 Ynes 個人費用（只有 Ynes 參與）
+  const twData=data.filter(e=>{
+    if(!(e.members.length===1&&e.members[0]===YNES)) return false;
+    return dateToInput(e.date)>='2026-05-21';
+  });
+
+  if(!twData.length){
+    el.innerHTML=`<div class="an-scroll"><div style="height:16px"></div>
+      <div class="an-card" style="text-align:center;padding:20px 16px">
+        <div style="font-size:32px;margin-bottom:8px">🇹🇼</div>
+        <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px">Ynes 台灣花費</div>
+        <div style="font-size:13px;color:var(--txt2);line-height:1.6">5/21 起的個人花費<br>點右下角 ＋ 新增（貨幣選 NT$，日期填 5/21 後）</div>
+      </div>
+      <div style="height:80px"></div>
+    </div>`;
+    return;
+  }
+
+  const totalNTD=twData.filter(e=>e.currency==='NTD').reduce((s,e)=>s+e.amount,0);
+  const totalMYR=twData.reduce((s,e)=>s+toMYR(e.amount,e.currency,rate,ntdRate),0);
+
+  // 類別統計
+  const catSpend={};CAT_LIST.forEach(c=>catSpend[c.id]=0);
+  twData.forEach(e=>{catSpend[e.cat]=(catSpend[e.cat]||0)+toMYR(e.amount,e.currency,rate,ntdRate);});
+  const catsUsed=CAT_LIST.filter(c=>catSpend[c.id]>0).sort((a,b)=>catSpend[b.id]-catSpend[a.id]);
+  const maxCat=Math.max(...catsUsed.map(c=>catSpend[c.id]),1);
+  const catBar=catsUsed.map(c=>`<div class="bar-row"><div class="bar-lbl" style="text-align:center;font-size:15px">${c.icon}</div><div class="bar-wrap"><div class="bar-fill grn" style="width:${((catSpend[c.id]/maxCat)*100).toFixed(0)}%"></div></div><div class="bar-val">RM ${catSpend[c.id].toFixed(0)}</div></div>`).join('');
+
+  // 每日統計
+  const daySpend={};
+  twData.forEach(e=>{const a=toMYR(e.amount,e.currency,rate,ntdRate);daySpend[e.date]=(daySpend[e.date]||0)+a;});
+  const sortedDays=Object.keys(daySpend).sort((a,b)=>dateToInput(a).localeCompare(dateToInput(b)));
+  const maxDay=Math.max(...Object.values(daySpend),1);
+  const dayBar=sortedDays.map(d=>`<div class="bar-row"><div class="bar-lbl">${d}</div><div class="bar-wrap"><div class="bar-fill" style="width:${((daySpend[d]/maxDay)*100).toFixed(0)}%"></div></div><div class="bar-val">RM ${daySpend[d].toFixed(0)}</div></div>`).join('');
+
+  // 費用列表
+  const expList=[...twData].sort((a,b)=>dateToInput(a.date).localeCompare(dateToInput(b.date))).map(e=>{
+    const cat=CAT_LIST.find(c=>c.id===e.cat)||CAT_LIST[0];
+    const amtStr=e.currency==='NTD'?`NT$${e.amount.toLocaleString()}`:e.currency==='MYR'?`RM${e.amount.toLocaleString()}`:`¥${e.amount.toLocaleString()}`;
+    const myrStr=e.currency!=='MYR'?`≈ RM${toMYR(e.amount,e.currency,rate,ntdRate).toFixed(0)}`:'';
+    return `<div class="exp-card"><div class="exp-ico-w">${cat.icon}</div><div class="exp-info"><div class="exp-name">${e.name}</div><div class="exp-sub">${e.date}${e.note?' · '+e.note:''}</div></div><div class="exp-right"><div class="exp-jpy">${amtStr}</div>${myrStr?`<div class="exp-myr">${myrStr}</div>`:''}<button class="exp-del-btn" onclick="openEditExp('${e.id}')" style="color:var(--pri)">✏️</button><button class="exp-del-btn" onclick="delExpTW('${e.id}')">🗑️</button></div></div>`;
+  }).join('');
+
+  el.innerHTML=`<div class="an-scroll"><div style="height:12px"></div>
+    <div class="an-card">
+      <div class="an-hero">
+        <div class="an-hero-num">NT$ ${Math.round(totalNTD).toLocaleString()}</div>
+        <div class="an-hero-sub">台灣花費（≈ RM ${totalMYR.toFixed(0)}）</div>
+        <div class="an-hero-sub">${twData.length} 筆 · 5/21 起</div>
+      </div>
+      <div class="mini-cards">
+        <div class="mini-card"><div class="mini-card-lbl">NT$ 小計</div><div class="mini-card-val">NT$${Math.round(totalNTD).toLocaleString()}</div></div>
+        <div class="mini-card"><div class="mini-card-lbl">折合 RM</div><div class="mini-card-val grn">RM ${totalMYR.toFixed(0)}</div></div>
+      </div>
+    </div>
+    <div class="an-card"><div class="an-ttl">🏷️ 類別花費</div>${catBar||'<div style="font-size:13px;color:var(--txt3)">尚無資料</div>'}</div>
+    <div class="an-card"><div class="an-ttl">📅 每日花費</div>${dayBar||'<div style="font-size:13px;color:var(--txt3)">尚無資料</div>'}</div>
+    <div class="sec-lbl">🧾 台灣費用明細</div>
+    ${expList}
+    <div style="height:80px"></div>
+  </div>`;
+}
+
+function delExpTW(id){
+  if(!confirm('刪除這筆費用？'))return;
+  saveSplitData(getSplitData().filter(e=>e.id!==id));
+  renderYnesTW();
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+initFirebase();
+renderItin();
+renderTrans();
+renderHotels();
+renderPack();
+renderPhrases();
+renderShop();
+renderSplit();
+</script>
+</body>
+</html>
